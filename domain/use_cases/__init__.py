@@ -1,4 +1,4 @@
-from .get_updated_entities import GetUpdatedEntities
+from .get_updated_replaced_entities import GetUpdatedReplacedEntities
 from .get_entities_for_delete import GetEntitiesForDelete
 from .save_entities import SaveEntities
 from .delete_entities import DeleteEntities

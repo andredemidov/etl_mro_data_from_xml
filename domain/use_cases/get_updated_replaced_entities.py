@@ -1,7 +1,7 @@
 from domain.entities import Equipment, TechPosition, ObjectRepairGroup
 
 
-class GetUpdatedEntities:
+class GetUpdatedReplacedEntities:
 
     def __init__(
             self,
@@ -16,7 +16,7 @@ class GetUpdatedEntities:
     def execute(self):
         new_entities = self._new_entities_repository.list()
         updated_entities = list()
-        current_entities_dict = self._get_current_entities_dict()
+        current_entities_dict = {entity.toir_id: entity for entity in self._current_entities_repository.list()}
 
         for new_entity in new_entities:
             self._set_update_replace_status(new_entity, current_entities_dict)
@@ -35,7 +35,7 @@ class GetUpdatedEntities:
         if current_entity:
             new_entity.self_id = current_entity.self_id
             # replaced
-            if new_entity.parent_toir_id != current_entity.parent:
+            if new_entity.parent_toir_id != current_entity.parent_toir_id:
                 new_entity.replaced = True
             # update status
             if new_entity.to_compare_dict() != current_entity.to_compare_dict():
@@ -46,10 +46,3 @@ class GetUpdatedEntities:
                 current_entity.update_status = 'not updated'
         else:
             new_entity.update_status = 'new'
-
-    def _get_current_entities_dict(self) -> dict:
-        current_entities = self._current_entities_repository.list()
-        current_entities_dict = {}
-        for entity in current_entities:
-            current_entities_dict[entity.toir_id] = entity
-        return current_entities_dict

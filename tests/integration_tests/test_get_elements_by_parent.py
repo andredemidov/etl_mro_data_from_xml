@@ -7,14 +7,14 @@ class TestGetElementsByParent(unittest.TestCase):
 
     def test_execute(self):
         # arrange
-        xml_iterator = ElementTree.iterparse(r'C:\Users\demid\Documents\INK\python_ink\toir_integration\test_data\test_toir_data.xml')
+        xml_iterator = ElementTree.iterparse(r'C:\Users\demid\Documents\python\work_projects\toir_integration\test_data\test_toir_data.xml')
         elements = list()
         for _, element in xml_iterator:
             if 'ДанныеОР_' in element.tag:
                 elements.append(element)
 
         # act
-        result = GetElementsByParent(elements).execute('c38a1ee6-25f3-11ea-84c1-005056a40062', 'object_repair_group')
+        result = GetElementsByParent(elements).execute('d799f32a-fc65-11e5-81a1-005056a4190d', 'equipment')
 
         # assert
-        self.assertEqual(len(result), 9)
+        self.assertEqual(3, len(result))

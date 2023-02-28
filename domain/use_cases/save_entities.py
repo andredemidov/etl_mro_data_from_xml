@@ -1,5 +1,3 @@
-from domain.entities import Equipment, TechPosition, ObjectRepairGroup
-
 
 class SaveEntities:
 
@@ -7,21 +5,18 @@ class SaveEntities:
         self._adapter = adapter
         self._repository = repository
 
-    @staticmethod
-    def _pass_action(entity):
-        pass
-
-    def _operate_entity(self, entity: (Equipment, TechPosition, ObjectRepairGroup)):
+    def execute(self) -> dict:
+        statistic = {'success': 0, 'error': 0}
         actions = {
             'updated': self._adapter.update,
             'new': self._adapter.create,
-            'replaced': self._adapter.replace,
         }
-        actions.get(entity.update_status, self._pass_action)(entity)
-        if entity.replaced:
-            self._adapter.replace(entity)
-
-    def execute(self):
         entities = self._repository.list()
         for entity in entities:
-            self._operate_entity(entity)
+            action = actions.get(entity.update_status)
+            if action:
+                status = action(entity)
+                statistic[status] += 1
+            if entity.replaced:
+                self._adapter.replace(entity)
+        return statistic

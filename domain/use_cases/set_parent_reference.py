@@ -15,7 +15,7 @@ class SetParentReference:
         data_dict = dict(map(lambda x: (x.toir_id, x), self._object_repair_group_repository.list()))
         data_dict.update(dict(map(lambda x: (x.toir_id, x), self._tech_position_repository.list())))
         data_dict.update(dict(map(lambda x: (x.toir_id, x), self._equipment_repository.list())))
-        data_dict.update(dict((self._operation_object.toir_id, self._operation_object)))
+        data_dict.update({self._operation_object.toir_id: self._operation_object})
 
         self._set_parent_for_entity(data_dict, self._object_repair_group_repository)
         self._set_parent_for_entity(data_dict, self._tech_position_repository)

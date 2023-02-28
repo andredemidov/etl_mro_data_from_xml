@@ -5,8 +5,8 @@ import requests
 
 class NeosintezGateway:
 
-    equipment_class_id = ''
-    tech_position_class_id = ''
+    equipment_class_id = '98a4bfa3-0929-e811-810d-c4afdb1aea70'
+    tech_position_class_id = '379086c1-575b-ed11-914d-005056b6948b'
     object_repair_group_class_id = '9e8f1a26-778d-e811-810f-edf0bf5e0091'
     operation_object_class_id = 'ac65f34b-5623-ed11-9141-005056b6948b'
 
@@ -66,10 +66,8 @@ class NeosintezGateway:
         else:
             if attribute_type == 'int':
                 return 0
-            elif attribute_type == 'date':
-                return None
             else:
-                return ''
+                return None
 
     def make_search_request(self, route, payload) -> requests.Response:
         """Метод выполняет поисковый запрос по условиям, переданным в payload
@@ -120,12 +118,13 @@ class NeosintezGateway:
         if response.status_code != 200:
             print(req_url)
             print(request_body)
-            print(response.text)
+            print(json.loads(response.text))
         return response
 
-    def create(self, parent_id, request_body) -> requests.Response:
+    def create(self, parent_id, create_request_body) -> requests.Response:
         req_url = self._url + f'api/objects?parent={parent_id}'
-        payload = json.dumps(request_body)
+
+        payload = json.dumps(create_request_body)
 
         headers = {
             'Accept': 'application/json',
@@ -133,10 +132,11 @@ class NeosintezGateway:
             'Content-Type': 'application/json-patch+json'
         }
         response = requests.post(req_url, headers=headers, data=payload)
+
         if response.status_code != 200:
             print(req_url)
-            print(request_body)
-            print(response.text)
+            print(create_request_body)
+            print(json.loads(response.text))
         return response
 
     def delete_collection_item(self, host, item_id):

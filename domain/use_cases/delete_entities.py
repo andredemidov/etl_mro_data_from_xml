@@ -4,7 +4,10 @@ class DeleteEntities:
         self._adapter = adapter
         self._repository = repository
 
-    def execute(self):
+    def execute(self) -> dict:
+        statistic = {'success': 0, 'error': 0}
         entities = self._repository.list()
         for entity in entities:
-            self._adapter.delete(entity)
+            status = self._adapter.delete(entity)
+            statistic[status] += 1
+        return statistic
