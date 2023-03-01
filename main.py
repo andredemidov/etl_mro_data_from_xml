@@ -31,7 +31,7 @@ def start():
 
     with open('auth_data.txt') as f:
         aut_string = f.read()
-    token = data_sources.GetToken(URL).execute(aut_string)
+    token = data_sources.GetToken.execute(URL, aut_string)
     operation_object_repository = Repository()
     get_current_data_adapter = data_sources.GetCurrentDataAdapter(url=URL, token=token)
     post_data_adapter = data_sources.PostDataAdapter(url=URL, token=token)
