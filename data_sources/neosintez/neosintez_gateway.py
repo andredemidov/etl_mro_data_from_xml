@@ -121,7 +121,7 @@ class NeosintezGateway:
             print(json.loads(response.text))
         return response
 
-    def create(self, parent_id, create_request_body) -> requests.Response:
+    def create_item(self, parent_id, create_request_body) -> requests.Response:
         req_url = self._url + f'api/objects?parent={parent_id}'
 
         payload = json.dumps(create_request_body)

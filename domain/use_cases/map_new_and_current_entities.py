@@ -1,30 +1,25 @@
 from domain.entities import Equipment, TechPosition, ObjectRepairGroup
 
 
-class GetUpdatedReplacedEntities:
+class MapNewAndCurrentEntities:
 
     def __init__(
             self,
             new_entities_repository,
             current_entities_repository,
-            updated_entities_repository,
     ):
         self._new_entities_repository = new_entities_repository
         self._current_entities_repository = current_entities_repository
-        self._updated_entities_repository = updated_entities_repository
 
     def execute(self):
         new_entities = self._new_entities_repository.list()
-        updated_entities = list()
         current_entities_dict = {entity.toir_id: entity for entity in self._current_entities_repository.list()}
 
         for new_entity in new_entities:
             self._set_update_replace_status(new_entity, current_entities_dict)
 
-            if new_entity.update_status in ['updated', 'new'] or new_entity.replaced:
-                updated_entities.append(new_entity)
-
-        self._updated_entities_repository.add(updated_entities)
+        entities_for_delete = list(filter(lambda x: x.update_status == 'empty', self._current_entities_repository.list()))
+        self._new_entities_repository.add(entities_for_delete)
 
     @staticmethod
     def _set_update_replace_status(

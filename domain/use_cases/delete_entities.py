@@ -6,8 +6,8 @@ class DeleteEntities:
 
     def execute(self) -> dict:
         statistic = {'success': 0, 'error': 0}
-        entities = self._repository.list()
-        for entity in entities:
+        entities_for_delete = list(filter(lambda x: x.update_status == 'empty', self._repository.list()))
+        for entity in entities_for_delete:
             status = self._adapter.delete(entity)
             statistic[status] += 1
         return statistic

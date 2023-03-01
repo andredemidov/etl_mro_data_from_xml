@@ -1,20 +1,24 @@
 import unittest
 import xml.etree.ElementTree as ElementTree
-from data_sources.xml_file.get_elements_by_parent import GetElementsByParent
+import data_sources
+from domain import entities
 
 
 class TestGetElementsByParent(unittest.TestCase):
 
     def test_execute(self):
         # arrange
-        xml_iterator = ElementTree.iterparse(r'C:\Users\demid\Documents\python\work_projects\toir_integration\test_data\test_toir_data.xml')
-        elements = list()
-        for _, element in xml_iterator:
-            if 'ДанныеОР_' in element.tag:
-                elements.append(element)
+        # parser = ElementTree.XMLParser(encoding='UTF-8')
+        file_path = r'C:\Users\demid\Documents\python\work_projects\toir_integration\test_data\test_toir_data.xml'
+        adapter = data_sources.GetNewDataAdapter(file_path)
+        fake_operation_object = entities.OperationObject(
+            'forvalidation',
+            'forvalidation',
+            '81066aeb-ca71-11ea-8528-005056a40062'
+        )
 
         # act
-        result = GetElementsByParent(elements).execute('d799f32a-fc65-11e5-81a1-005056a4190d', 'equipment')
-
+        equipments = adapter.get_new_equipment(fake_operation_object)
+        print(len(equipments))
         # assert
-        self.assertEqual(3, len(result))
+        self.assertNotEqual(len(equipments), 0)

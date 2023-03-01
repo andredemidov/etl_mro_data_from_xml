@@ -12,6 +12,7 @@ class SaveEntities:
             'new': self._adapter.create,
         }
         entities = self._repository.list()
+        entities.sort(key=lambda x: x.level)
         for entity in entities:
             action = actions.get(entity.update_status)
             if action:

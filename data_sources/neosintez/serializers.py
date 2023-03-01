@@ -5,6 +5,29 @@ from domain import entities
 class ObjectRepairGroupSerializer:
 
     @staticmethod
+    def init_from_neosintez(item: dict) -> entities.ObjectRepairGroup:
+        attributes = item['Object']['Attributes']
+        self_id = item['Object']['Id']
+
+        toir_id = NeosintezGateway.get_value(attributes, NeosintezGateway.toir_id_attribute_id)
+        level = int(NeosintezGateway.get_value(attributes, NeosintezGateway.level_attribute_id, attribute_type='int'))
+        parent = NeosintezGateway.get_value(attributes, NeosintezGateway.parent_attribute_id)
+        name = NeosintezGateway.get_value(attributes, NeosintezGateway.name_attribute_id)
+        toir_url = NeosintezGateway.get_value(attributes, NeosintezGateway.toir_url_attribute_id)
+        departament_id = NeosintezGateway.get_value(attributes, NeosintezGateway.departament_id_attribute_id)
+
+        repair_object = entities.ObjectRepairGroup(
+            toir_id=toir_id,
+            level=level,
+            parent_toir_id=parent,
+            name=name,
+            toir_url=toir_url,
+            departament_id=departament_id,
+            self_id=self_id,
+        )
+        return repair_object
+
+    @staticmethod
     def get_create_request_body(item: entities.ObjectRepairGroup) -> dict:
         create_request_body = {
             "Id": "00000000-0000-0000-0000-000000000000",
@@ -61,6 +84,31 @@ class ObjectRepairGroupSerializer:
 
 
 class TechPositionSerializer:
+
+    @staticmethod
+    def init_from_neosintez(item: dict) -> entities.TechPosition:
+        attributes = item['Object']['Attributes']
+        self_id = item['Object']['Id']
+
+        toir_id = NeosintezGateway.get_value(attributes, NeosintezGateway.toir_id_attribute_id)
+        level = int(NeosintezGateway.get_value(attributes, NeosintezGateway.level_attribute_id, attribute_type='int'))
+        parent = NeosintezGateway.get_value(attributes, NeosintezGateway.parent_attribute_id)
+        name = NeosintezGateway.get_value(attributes, NeosintezGateway.name_attribute_id)
+        tech_number = NeosintezGateway.get_value(attributes, NeosintezGateway.tech_number_attribute_id)
+        toir_url = NeosintezGateway.get_value(attributes, NeosintezGateway.toir_url_attribute_id)
+        departament_id = NeosintezGateway.get_value(attributes, NeosintezGateway.departament_id_attribute_id)
+
+        repair_object = entities.TechPosition(
+            toir_id=toir_id,
+            level=level,
+            parent_toir_id=parent,
+            name=name,
+            tech_number=tech_number,
+            toir_url=toir_url,
+            departament_id=departament_id,
+            self_id=self_id,
+        )
+        return repair_object
 
     @staticmethod
     def get_create_request_body(item: entities.TechPosition) -> dict:
@@ -126,6 +174,45 @@ class TechPositionSerializer:
 
 
 class EquipmentSerializer:
+
+    @staticmethod
+    def init_from_neosintez(item: dict) -> entities.Equipment:
+        attributes = item['Object']['Attributes']
+        self_id = item['Object']['Id']
+
+        toir_id = NeosintezGateway.get_value(attributes, NeosintezGateway.toir_id_attribute_id)
+        level = int(NeosintezGateway.get_value(attributes, NeosintezGateway.level_attribute_id, attribute_type='int'))
+        parent = NeosintezGateway.get_value(attributes, NeosintezGateway.parent_attribute_id)
+        name = NeosintezGateway.get_value(attributes, NeosintezGateway.name_attribute_id)
+        tech_number = NeosintezGateway.get_value(attributes, NeosintezGateway.tech_number_attribute_id)
+        toir_url = NeosintezGateway.get_value(attributes, NeosintezGateway.toir_url_attribute_id)
+        operation_date = NeosintezGateway.get_value(attributes, NeosintezGateway.operation_date_attribute_id)
+        registration_number = NeosintezGateway.get_value(attributes, NeosintezGateway.registration_number_attribute_id)
+        commodity_producer = NeosintezGateway.get_value(attributes, NeosintezGateway.commodity_producer_attribute_id)
+        commodity_number = NeosintezGateway.get_value(attributes, NeosintezGateway.commodity_number_attribute_id)
+        departament_id = NeosintezGateway.get_value(attributes, NeosintezGateway.departament_id_attribute_id)
+        object_type_id = NeosintezGateway.get_value(attributes, NeosintezGateway.object_type_attribute_id)
+        operating = NeosintezGateway.get_value(attributes, NeosintezGateway.operating_attribute_id)
+        category = NeosintezGateway.get_value(attributes, NeosintezGateway.category_attribute_id)
+
+        repair_object = entities.Equipment(
+            toir_id=toir_id,
+            level=level,
+            parent_toir_id=parent,
+            name=name,
+            operating=operating,
+            tech_number=tech_number,
+            toir_url=toir_url,
+            registration_number=registration_number,
+            commodity_producer=commodity_producer,
+            commodity_number=commodity_number,
+            operation_date=operation_date,
+            departament_id=departament_id,
+            object_type_id=object_type_id,
+            self_id=self_id,
+            category=category,
+        )
+        return repair_object
 
     @staticmethod
     def get_create_request_body(item: entities.Equipment) -> dict:

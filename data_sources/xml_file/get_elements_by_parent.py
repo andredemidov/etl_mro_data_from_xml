@@ -3,7 +3,7 @@ from typing import Sequence
 
 class GetElementsByParent:
 
-    def __init__(self, elements: list):
+    def __init__(self, elements: dict[str, list]):
         self._result = list()
         self._elements = elements
 
@@ -11,7 +11,7 @@ class GetElementsByParent:
     def _check_equipment(element) -> bool:
         group_flag = element.find('РеквизитыОР/ЭтоГруппа').text == 'true'
         tech_position_flag = element.find('РеквизитыОР/Группа').text == 'Технологическая позиция'
-        return group_flag or tech_position_flag
+        return not group_flag and not tech_position_flag
 
     @staticmethod
     def _check_tech_position(element) -> bool:
@@ -25,14 +25,13 @@ class GetElementsByParent:
         return group_flag
 
     def get_elements_by_parent(self, parent_id, function):
-        for element in self._elements:
-            if 'ДанныеОР_' in element.tag:
-                parent = element.find('РеквизитыОР/ОбъектРемонта_Родитель').text
-
-                if parent == parent_id and function(element):
-                    self._result.append(element)
-                    toir_id = element.find('РеквизитыОР/ОбъектРемонта').text
-                    self.get_elements_by_parent(toir_id, function)
+        childs = self._elements.get(parent_id)
+        if childs:
+            for child in childs:
+                toir_id = child.find('РеквизитыОР/ОбъектРемонта').text
+                if function(child):
+                    self._result.append(child)
+                self.get_elements_by_parent(toir_id, function)
 
     def execute(self, parent_toir_id: str, class_name: str) -> Sequence:
         check_functions = {
@@ -44,5 +43,6 @@ class GetElementsByParent:
         if function is None:
             message = f'There is no function for class name {class_name}'
             raise KeyError(message)
+        self._result = []
         self.get_elements_by_parent(parent_toir_id, function)
         return self._result

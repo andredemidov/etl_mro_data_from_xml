@@ -22,7 +22,11 @@ def start():
 
         # new data
         new_object_repair_group_repository = Repository()
-        use_cases.GetNewObjectRepairGroup(get_new_data_adapter, new_object_repair_group_repository, operation_object).execute()
+        use_cases.GetNewObjectRepairGroup(
+            adapter=get_new_data_adapter,
+            repository=new_object_repair_group_repository,
+            operation_object=operation_object,
+        ).execute()
 
         new_tech_position_repository = Repository()
         use_cases.GetNewTechPosition(get_new_data_adapter, new_tech_position_repository, operation_object).execute()
@@ -42,19 +46,12 @@ def start():
             adapter=get_current_data_adapter,
             repository=current_object_repair_group_repository,
         ).execute(operation_object)
-        updated_object_repair_group_repository = Repository()
-        use_cases.GetUpdatedReplacedEntities(
+        use_cases.MapNewAndCurrentEntities(
             new_entities_repository=new_object_repair_group_repository,
             current_entities_repository=current_object_repair_group_repository,
-            updated_entities_repository=updated_object_repair_group_repository,
-        ).execute()
-        delete_object_repair_group_repository = Repository()
-        use_cases.GetEntitiesForDelete(
-            current_entities_repository=current_object_repair_group_repository,
-            delete_entities_repository=delete_object_repair_group_repository,
         ).execute()
 
-        statistic = use_cases.SaveEntities(post_data_adapter, updated_object_repair_group_repository).execute()
+        statistic = use_cases.SaveEntities(post_data_adapter, new_object_repair_group_repository).execute()
         print(statistic)
 
         # tech_position
@@ -63,19 +60,12 @@ def start():
             adapter=get_current_data_adapter,
             repository=current_tech_position_repository,
         ).execute(operation_object)
-        updated_tech_position_repository = Repository()
-        use_cases.GetUpdatedReplacedEntities(
+        use_cases.MapNewAndCurrentEntities(
             new_entities_repository=new_tech_position_repository,
             current_entities_repository=current_tech_position_repository,
-            updated_entities_repository=updated_tech_position_repository,
-        ).execute()
-        delete_tech_position_repository = Repository()
-        use_cases.GetEntitiesForDelete(
-            current_entities_repository=current_tech_position_repository,
-            delete_entities_repository=delete_tech_position_repository,
         ).execute()
 
-        statistic = use_cases.SaveEntities(post_data_adapter, updated_tech_position_repository).execute()
+        statistic = use_cases.SaveEntities(post_data_adapter, new_tech_position_repository).execute()
         print(statistic)
 
         # equipment
@@ -84,28 +74,21 @@ def start():
             adapter=get_current_data_adapter,
             repository=current_equipment_repository,
         ).execute(operation_object)
-        updated_equipment_repository = Repository()
-        use_cases.GetUpdatedReplacedEntities(
+        use_cases.MapNewAndCurrentEntities(
             new_entities_repository=new_equipment_repository,
             current_entities_repository=current_equipment_repository,
-            updated_entities_repository=updated_equipment_repository,
-        ).execute()
-        delete_equipment_repository = Repository()
-        use_cases.GetEntitiesForDelete(
-            current_entities_repository=current_equipment_repository,
-            delete_entities_repository=delete_equipment_repository,
         ).execute()
 
-        statistic = use_cases.SaveEntities(post_data_adapter, updated_equipment_repository).execute()
+        statistic = use_cases.SaveEntities(post_data_adapter, new_equipment_repository).execute()
         print(statistic)
 
         # delete
 
-        statistic = use_cases.DeleteEntities(post_data_adapter, delete_object_repair_group_repository).execute()
+        statistic = use_cases.DeleteEntities(post_data_adapter, new_object_repair_group_repository).execute()
         print('object_repair_group', statistic)
-        statistic = use_cases.DeleteEntities(post_data_adapter, delete_tech_position_repository).execute()
+        statistic = use_cases.DeleteEntities(post_data_adapter, new_tech_position_repository).execute()
         print('tech_position', statistic)
-        statistic = use_cases.DeleteEntities(post_data_adapter, delete_equipment_repository).execute()
+        statistic = use_cases.DeleteEntities(post_data_adapter, new_equipment_repository).execute()
         print('equipment', statistic)
 
 
