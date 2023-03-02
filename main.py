@@ -31,99 +31,54 @@ def start():
 
     with open('auth_data.txt') as f:
         aut_string = f.read()
-    token = data_sources.GetToken.execute(URL, aut_string)
-    operation_object_repository = Repository()
-    get_current_data_adapter = data_sources.GetCurrentDataAdapter(url=URL, token=token)
-    post_data_adapter = data_sources.PostDataAdapter(url=URL, token=token)
+    session = data_sources.GetSession.execute(URL, aut_string)
+    try:
+        operation_object_repository = Repository()
+        get_current_data_adapter = data_sources.GetCurrentDataAdapter(url=URL, session=session)
+        post_data_adapter = data_sources.PostDataAdapter(url=URL, session=session)
 
-    use_cases.GetOperationObjects(get_current_data_adapter, operation_object_repository).execute()
-    logging.info(f'Total objects {len(operation_object_repository.list())}')
+        use_cases.GetOperationObjects(get_current_data_adapter, operation_object_repository).execute()
+        logging.info(f'Total objects {len(operation_object_repository.list())}')
 
-    for operation_object in operation_object_repository.list():
+        for operation_object in operation_object_repository.list():
+            try:
+                # new data
+                new_repository = Repository()
+                use_cases.GetNewObjectRepairGroup(get_new_data_adapter, new_repository, operation_object).execute()
+                use_cases.GetNewTechPosition(get_new_data_adapter, new_repository, operation_object).execute()
+                use_cases.GetNewEquipment(get_new_data_adapter, new_repository, operation_object).execute()
 
-        # new data
-        new_object_repair_group_repository = Repository()
-        use_cases.GetNewObjectRepairGroup(
-            adapter=get_new_data_adapter,
-            repository=new_object_repair_group_repository,
-            operation_object=operation_object,
-        ).execute()
+                logging.info(f'new entities: {len(new_repository.list())}')
 
-        new_tech_position_repository = Repository()
-        use_cases.GetNewTechPosition(get_new_data_adapter, new_tech_position_repository, operation_object).execute()
+                use_cases.SetParentReference(operation_object=operation_object, repository=new_repository).execute()
 
-        new_equipment_repository = Repository()
-        use_cases.GetNewEquipment(get_new_data_adapter, new_equipment_repository, operation_object).execute()
+                current_repository = Repository()
+                use_cases.GetCurrentObjectRepairGroup(
+                    get_current_data_adapter,
+                    current_repository
+                ).execute(operation_object)
+                use_cases.GetCurrentTechPosition(get_current_data_adapter, current_repository).execute(operation_object)
+                use_cases.GetCurrentEquipment(get_current_data_adapter, current_repository).execute(operation_object)
 
-        logging.info(
-            f'groups: {len(new_object_repair_group_repository.list())}',
-            f'tech_positions: {len(new_tech_position_repository.list())}',
-            f'equipments: {len(new_equipment_repository.list())}',
-        )
+                use_cases.MapNewAndCurrentEntities(
+                    new_entities_repository=new_repository,
+                    current_entities_repository=current_repository,
+                ).execute()
 
-        use_cases.SetParentReference(
-            operation_object=operation_object,
-            object_repair_group_repository=new_object_repair_group_repository,
-            tech_position_repository=new_tech_position_repository,
-            equipment_repository=new_equipment_repository,
-        ).execute()
-        # object_repair_group
-        current_object_repair_group_repository = Repository()
-        use_cases.GetCurrentObjectRepairGroup(
-            adapter=get_current_data_adapter,
-            repository=current_object_repair_group_repository,
-        ).execute(operation_object)
-        use_cases.MapNewAndCurrentEntities(
-            new_entities_repository=new_object_repair_group_repository,
-            current_entities_repository=current_object_repair_group_repository,
-        ).execute()
+                logging.info('creating and updating')
+                statistic = use_cases.SaveEntities(post_data_adapter, new_repository).execute()
+                log_statistic(statistic)
 
-        logging.info('creating and updating of groups')
-        statistic = use_cases.SaveEntities(post_data_adapter, new_object_repair_group_repository).execute()
-        log_statistic(statistic)
-
-        # tech_position
-        current_tech_position_repository = Repository()
-        use_cases.GetCurrentTechPosition(
-            adapter=get_current_data_adapter,
-            repository=current_tech_position_repository,
-        ).execute(operation_object)
-        use_cases.MapNewAndCurrentEntities(
-            new_entities_repository=new_tech_position_repository,
-            current_entities_repository=current_tech_position_repository,
-        ).execute()
-
-        logging.info('creating and updating of tech_positions')
-        statistic = use_cases.SaveEntities(post_data_adapter, new_tech_position_repository).execute()
-        log_statistic(statistic)
-
-        # equipment
-        current_equipment_repository = Repository()
-        use_cases.GetCurrentEquipment(
-            adapter=get_current_data_adapter,
-            repository=current_equipment_repository,
-        ).execute(operation_object)
-        use_cases.MapNewAndCurrentEntities(
-            new_entities_repository=new_equipment_repository,
-            current_entities_repository=current_equipment_repository,
-        ).execute()
-
-        logging.info('creating and updating of equipments')
-        statistic = use_cases.SaveEntities(post_data_adapter, new_equipment_repository).execute()
-        log_statistic(statistic)
-
-        # delete
-        logging.info('deleting of groups')
-        statistic = use_cases.DeleteEntities(post_data_adapter, new_object_repair_group_repository).execute()
-        log_statistic(statistic)
-
-        logging.info('deleting of tech_positions')
-        statistic = use_cases.DeleteEntities(post_data_adapter, new_tech_position_repository).execute()
-        log_statistic(statistic)
-
-        logging.info('deleting of equipments')
-        statistic = use_cases.DeleteEntities(post_data_adapter, new_equipment_repository).execute()
-        log_statistic(statistic)
+                # delete
+                logging.info('deleting')
+                statistic = use_cases.DeleteEntities(post_data_adapter, new_repository).execute()
+                log_statistic(statistic)
+            except Exception as e:
+                print(e)
+                logging.exception('Exception occured')
+    finally:
+        session.close()
+        logging.info('Session is closed')
 
 
 if __name__ == '__main__':

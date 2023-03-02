@@ -15,6 +15,7 @@ class ObjectRepairGroupSerializer:
         name = NeosintezGateway.get_value(attributes, NeosintezGateway.name_attribute_id)
         toir_url = NeosintezGateway.get_value(attributes, NeosintezGateway.toir_url_attribute_id)
         departament_id = NeosintezGateway.get_value(attributes, NeosintezGateway.departament_id_attribute_id)
+        object_id = NeosintezGateway.get_value(attributes, NeosintezGateway.object_attribute_id, get_only_id=True)
 
         repair_object = entities.ObjectRepairGroup(
             toir_id=toir_id,
@@ -24,6 +25,7 @@ class ObjectRepairGroupSerializer:
             toir_url=toir_url,
             departament_id=departament_id,
             self_id=self_id,
+            object_id=object_id,
         )
         return repair_object
 
@@ -42,6 +44,12 @@ class ObjectRepairGroupSerializer:
     @staticmethod
     def get_update_request_body(item: entities.ObjectRepairGroup) -> list:
         put_request_body = [
+            {
+                'Name': 'forvalidation',
+                'Value': {'Name': 'forvalidation', 'Id': item.object_id} if item.object_id else None,
+                'Type': 8,
+                'Id': NeosintezGateway.object_attribute_id
+            },
             {
                 'Name': 'forvalidation',
                 'Value': item.toir_id if item.toir_id else None,
@@ -97,6 +105,7 @@ class TechPositionSerializer:
         tech_number = NeosintezGateway.get_value(attributes, NeosintezGateway.tech_number_attribute_id)
         toir_url = NeosintezGateway.get_value(attributes, NeosintezGateway.toir_url_attribute_id)
         departament_id = NeosintezGateway.get_value(attributes, NeosintezGateway.departament_id_attribute_id)
+        object_id = NeosintezGateway.get_value(attributes, NeosintezGateway.object_attribute_id, get_only_id=True)
 
         repair_object = entities.TechPosition(
             toir_id=toir_id,
@@ -107,6 +116,7 @@ class TechPositionSerializer:
             toir_url=toir_url,
             departament_id=departament_id,
             self_id=self_id,
+            object_id=object_id,
         )
         return repair_object
 
@@ -126,6 +136,12 @@ class TechPositionSerializer:
     def get_update_request_body(item: entities.TechPosition) -> list:
 
         put_request_body = [
+            {
+                'Name': 'forvalidation',
+                'Value': {'Name': 'forvalidation', 'Id': item.object_id} if item.object_id else None,
+                'Type': 8,
+                'Id': NeosintezGateway.object_attribute_id
+            },
             {
                 'Name': 'forvalidation',
                 'Value': item.toir_id if item.toir_id else None,
@@ -194,6 +210,7 @@ class EquipmentSerializer:
         object_type_id = NeosintezGateway.get_value(attributes, NeosintezGateway.object_type_attribute_id)
         operating = NeosintezGateway.get_value(attributes, NeosintezGateway.operating_attribute_id)
         category = NeosintezGateway.get_value(attributes, NeosintezGateway.category_attribute_id)
+        object_id = NeosintezGateway.get_value(attributes, NeosintezGateway.object_attribute_id, get_only_id=True)
 
         repair_object = entities.Equipment(
             toir_id=toir_id,
@@ -211,6 +228,7 @@ class EquipmentSerializer:
             object_type_id=object_type_id,
             self_id=self_id,
             category=category,
+            object_id=object_id,
         )
         return repair_object
 
@@ -230,6 +248,12 @@ class EquipmentSerializer:
     def get_update_request_body(item: entities.Equipment) -> list:
 
         put_request_body = [
+            {
+                'Name': 'forvalidation',
+                'Value': {'Name': 'forvalidation', 'Id': item.object_id} if item.object_id else None,
+                'Type': 8,
+                'Id': NeosintezGateway.object_attribute_id
+            },
             {
                 'Name': 'forvalidation',
                 'Value': item.toir_id if item.toir_id else None,

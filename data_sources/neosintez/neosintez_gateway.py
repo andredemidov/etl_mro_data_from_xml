@@ -10,6 +10,7 @@ class NeosintezGateway:
     object_repair_group_class_id = '9e8f1a26-778d-e811-810f-edf0bf5e0091'
     operation_object_class_id = 'ac65f34b-5623-ed11-9141-005056b6948b'
 
+    object_attribute_id = '1f99882d-e232-ea11-9100-005056b6e70e'
     toir_id_attribute_id = '73e3c201-5527-e811-810c-9ec54093bb77'
     config_attribute_id = '723bba30-4175-ed11-9152-005056b6948b'
     level_attribute_id = 'ef7b693e-46c0-ea11-9110-005056b6948b'
@@ -26,12 +27,12 @@ class NeosintezGateway:
     commodity_number_attribute_id = '706297c6-0a29-e811-810d-c4afdb1aea70'
     category_attribute_id = '2daf9add-0a29-e811-810d-c4afdb1aea70'
 
-    def __init__(self, url, token):
+    def __init__(self, url, session):
         self._url = url
-        self._token = token
+        self._session = session
 
     @staticmethod
-    def get_token(url, auth_string) -> str:
+    def get_token(url, auth_string, session) -> str:
         """
         Метод возвращает токен для аутентификации в Неосинтез на основании данных для аутентификации
         auth_string - строка вида grant_type=password&username=???&password=??&client_id=??&client_secret=??
@@ -41,7 +42,7 @@ class NeosintezGateway:
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-        response = requests.post(req_url, data=payload, headers=headers)
+        response = session.post(req_url, data=payload, headers=headers)
         if response.status_code == 200:
             return json.loads(response.text)['access_token']
         else:
@@ -76,12 +77,9 @@ class NeosintezGateway:
         req_url = self._url + route
         payload = json.dumps(payload)
         headers = {
-            'Accept': 'application/json',
-            'Authorization': f'Bearer {self._token}',
-            'Content-Type': 'application/json-patch+json',
             'X-HTTP-Method-Override': 'GET'
         }
-        return requests.post(req_url, headers=headers, data=payload)
+        return self._session.post(req_url, headers=headers, data=payload)
 
     def make_smart_search_request(self, payload) -> list:
         """Метод выполняет поисковый запрос по условиям, переданным в payload
@@ -109,12 +107,7 @@ class NeosintezGateway:
         req_url = self._url + f'api/objects/{item_id}/attributes'
         payload = json.dumps(request_body)
 
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': f'Bearer {self._token}',
-            'Content-Type': 'application/json-patch+json'
-        }
-        response = requests.put(req_url, headers=headers, data=payload)
+        response = self._session.put(req_url, data=payload)
         if response.status_code != 200:
             print(req_url)
             print(request_body)
@@ -126,12 +119,7 @@ class NeosintezGateway:
 
         payload = json.dumps(create_request_body)
 
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': f'Bearer {self._token}',
-            'Content-Type': 'application/json-patch+json'
-        }
-        response = requests.post(req_url, headers=headers, data=payload)
+        response = self._session.post(req_url, data=payload)
 
         if response.status_code != 200:
             print(req_url)
@@ -142,22 +130,12 @@ class NeosintezGateway:
     def delete_collection_item(self, host, item_id):
         req_url = self._url + f'api/objects/{host}/collections/{item_id}'
 
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': f'Bearer {self._token}',
-            'Content-Type': 'application/json-patch+json'
-        }
-        return requests.delete(req_url, headers=headers)
+        return self._session.delete(req_url)
 
     def delete_item(self, item_id):
         req_url = self._url + f'api/objects/{item_id}'
 
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': f'Bearer {self._token}',
-            'Content-Type': 'application/json-patch+json'
-        }
-        return requests.delete(req_url, headers=headers)
+        return self._session.delete(req_url)
 
     def create_collection(
             self,
@@ -186,19 +164,9 @@ class NeosintezGateway:
                 }
             }
         payload = json.dumps(payload)
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': f'Bearer {self._token}',
-            'Content-Type': 'application/json-patch+json'
-        }
-        return requests.post(req_url, headers=headers, data=payload)
+        return self._session.post(req_url, data=payload)
 
     def get_collections(self, host, collection_attribute_id) -> requests.Response:
         req_url = self._url + f'api/objects/{host}/collections?attributeId={collection_attribute_id}&Take=100'
 
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': f'Bearer {self._token}',
-            'Content-Type': 'application/json-patch+json'
-        }
-        return requests.get(req_url, headers=headers)
+        return self._session.get(req_url)

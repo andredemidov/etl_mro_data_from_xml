@@ -40,4 +40,4 @@ class GetCurrentDataAdapter(neosintez_gateway.NeosintezGateway):
         return items
 
     def get_operation_objects(self) -> list[entities.OperationObject]:
-        return GetOperationObjectAdapter(self._url, self._token).execute()
+        return GetOperationObjectAdapter(self._url, self._session).execute()

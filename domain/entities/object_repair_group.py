@@ -16,12 +16,14 @@ class ObjectRepairGroup:
     self_id: str = None
     replaced: bool = False
     update_status: STATUS = 'empty'
+    object_id: str = None
 
     def to_compare_dict(self) -> dict:
         return {
             'toir_id': self.toir_id,
             'name': self.name,
-            'toir_url': self.toir_url
+            'toir_url': self.toir_url,
+            'object_id': self.object_id,
         }
 
     def to_dict(self) -> dict:

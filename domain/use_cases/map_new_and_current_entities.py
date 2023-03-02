@@ -12,6 +12,7 @@ class MapNewAndCurrentEntities:
         self._current_entities_repository = current_entities_repository
 
     def execute(self):
+        # TODO: class of entity can be changed and an error may occur when saving the entity
         new_entities = self._new_entities_repository.list()
         current_entities_dict = {entity.toir_id: entity for entity in self._current_entities_repository.list()}
 

@@ -30,6 +30,7 @@ class Equipment:
     operation_date: datetime = None
     category: str = None
     replaced: bool = False
+    object_id: str = None
 
     attributes: List[EquipmentAttribute] = field(default_factory=list)
     past_repairs: List[EquipmentRepair] = field(default_factory=list)
@@ -53,6 +54,7 @@ class Equipment:
             'registration_number': self.registration_number,
             'commodity_producer': self.commodity_producer,
             'commodity_number': self.commodity_number,
+            'object_id': self.object_id,
         }
 
     def to_dict(self) -> dict:

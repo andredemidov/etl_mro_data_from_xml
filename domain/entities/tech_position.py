@@ -19,6 +19,7 @@ class TechPosition:
 
     self_id: str = None
     update_status: STATUS = 'empty'
+    object_id: str = None
 
     def to_compare_dict(self) -> dict:
         return {
@@ -26,6 +27,7 @@ class TechPosition:
             'name': self.name,
             'toir_url': self.toir_url,
             'tech_number': self.tech_number,
+            'object_id': self.object_id,
         }
 
     def to_dict(self) -> dict:

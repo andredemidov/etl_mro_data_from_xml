@@ -29,32 +29,38 @@ class GetNewDataAdapter:
 
         return elements_hash_table
 
-    def get_new_equipment(self, operation_object: entities.OperationObject) -> Sequence:
+    def get_new_equipment(self, operation_object: entities.OperationObject) -> Sequence[entities.Equipment]:
         xml_elements = xml_file.GetElementsByParent(self._elements).execute(operation_object.toir_id, 'equipment')
         result = list()
         for element in xml_elements:
-            result.append(self._init_equipment(element))
+            item = self._init_equipment(element)
+            item.object_id = operation_object.object_id
+            result.append(item)
 
         return result
 
-    def get_new_tech_position(self, operation_object: entities.OperationObject) -> Sequence:
+    def get_new_tech_position(self, operation_object: entities.OperationObject) -> Sequence[entities.TechPosition]:
         xml_elements = xml_file.GetElementsByParent(self._elements).execute(operation_object.toir_id, 'tech_position')
         result = list()
         for element in xml_elements:
-            result.append(self._init_tech_position(element))
+            item = self._init_tech_position(element)
+            item.object_id = operation_object.object_id
+            result.append(item)
 
         return result
 
-    def get_new_object_repair_group(self, operation_object: entities.OperationObject) -> Sequence:
+    def get_new_object_repair_group(self, operation_object: entities.OperationObject) -> Sequence[entities.ObjectRepairGroup]:
         xml_elements = xml_file.GetElementsByParent(self._elements).execute(operation_object.toir_id, 'object_repair_group')
         result = list()
         for element in xml_elements:
-            result.append(self._init_object_repair_group(element))
+            item = self._init_object_repair_group(element)
+            item.object_id = operation_object.object_id
+            result.append(item)
 
         return result
 
     @staticmethod
-    def _init_equipment(element):
+    def _init_equipment(element) -> entities.Equipment:
 
         toir_id = element.find('РеквизитыОР/ОбъектРемонта').text
         level = int(element.find('РеквизитыОР/УровеньГруппы').text)
@@ -93,7 +99,7 @@ class GetNewDataAdapter:
         return repair_object
 
     @staticmethod
-    def _init_object_repair_group(element):
+    def _init_object_repair_group(element) -> entities.ObjectRepairGroup:
         toir_id = element.find('РеквизитыОР/ОбъектРемонта').text
         level = int(element.find('РеквизитыОР/УровеньГруппы').text)
         parent = element.find('РеквизитыОР/ОбъектРемонта_Родитель').text
@@ -112,7 +118,7 @@ class GetNewDataAdapter:
         return repair_object
 
     @staticmethod
-    def _init_tech_position(element):
+    def _init_tech_position(element) -> entities.TechPosition:
 
         toir_id = element.find('РеквизитыОР/ОбъектРемонта').text
         level = int(element.find('РеквизитыОР/УровеньГруппы').text)
