@@ -1,11 +1,13 @@
 import logging
+import os
 from datetime import datetime
 from domain import use_cases
 import data_sources
 from repositories import Repository
 
 URL = 'https://operation.irkutskoil.ru/'
-XML_FILE = 'test_data/test_toir_data.xml'
+XML_FILE_DIRECTORY = '//irkoil/dfs/WorkDATA/1C_OBMEN/ТОиР_Неосинтез/'
+XML_FILE = 'ВыгрузкаДанныхОР'
 
 
 def log_statistic(statistic: dict):
@@ -26,8 +28,13 @@ def start():
             logging.StreamHandler()
         ]
     )
-
-    get_new_data_adapter = data_sources.GetNewDataAdapter(file_path=XML_FILE)
+    f_list = [f for f in os.listdir(path=XML_FILE_DIRECTORY) if XML_FILE in f and '~' not in f]
+    if f_list:
+        f_date = [os.path.getctime(XML_FILE_DIRECTORY + f) for f in f_list]
+        file_path = XML_FILE_DIRECTORY + f_list[f_date.index(max(f_date))]
+        get_new_data_adapter = data_sources.GetNewDataAdapter(file_path=file_path)
+    else:
+        raise FileNotFoundError()
 
     with open('auth_data.txt') as f:
         aut_string = f.read()
@@ -75,7 +82,7 @@ def start():
                 log_statistic(statistic)
             except Exception as e:
                 print(e)
-                logging.exception('Exception occured')
+                logging.exception('Exception occurred')
     finally:
         session.close()
         logging.info('Session is closed')
