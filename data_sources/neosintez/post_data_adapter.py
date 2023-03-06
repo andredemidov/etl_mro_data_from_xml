@@ -24,8 +24,12 @@ class PostDataAdapter(neosintez_gateway.NeosintezGateway):
         return status
 
     def replace(self, item: (entities.Equipment, entities.TechPosition, entities.ObjectRepairGroup)) -> str:
-        # TODO: replace
-        pass
+        response = self.change_parent(item.self_id, item.parent_object.self_id)
+        if response.status_code == 200:
+            status = 'success'
+        else:
+            status = 'error'
+        return status
 
     def delete(self, item: (entities.Equipment, entities.TechPosition, entities.ObjectRepairGroup)) -> str:
         response = self.delete_item(item.self_id)
