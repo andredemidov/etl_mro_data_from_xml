@@ -10,8 +10,9 @@ class ObjectRepairGroup:
     level: int
     parent_toir_id: str
     name: str
-    departament_id: str
     toir_url: str
+    departament_id: str = ''
+    departament_name: str = ''
     parent_object = None
     self_id: str = None
     replaced: bool = False

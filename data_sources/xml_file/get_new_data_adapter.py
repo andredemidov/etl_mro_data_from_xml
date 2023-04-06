@@ -1,8 +1,7 @@
 from typing import Sequence
-from datetime import datetime
 import xml.etree.ElementTree as ElementTree
 from domain import entities
-from data_sources import xml_file
+from .. import xml_file, serializers
 
 
 class GetNewDataAdapter:
@@ -33,108 +32,63 @@ class GetNewDataAdapter:
         xml_elements = xml_file.GetElementsByParent(self._elements).execute(operation_object.toir_id, 'equipment')
         result = list()
         for element in xml_elements:
-            item = self._init_equipment(element)
+            item = serializers.EquipmentSerializer.init_from_xml(element)
             item.object_id = operation_object.object_id
             result.append(item)
 
+            item.properties = self._get_extra_elements(element, 'Характеристики')
+            item.fact_repairs = self._get_extra_elements(element, 'ИсторияРемонтов')
+            item.plan_repairs = self._get_extra_elements(element, 'ПредстоящиеРемонты')
+            item.failures = self._get_extra_elements(element, 'Отказы')
+            item.parts = self._get_extra_elements(element, 'Запчасти')
         return result
 
     def get_new_tech_position(self, operation_object: entities.OperationObject) -> Sequence[entities.TechPosition]:
         xml_elements = xml_file.GetElementsByParent(self._elements).execute(operation_object.toir_id, 'tech_position')
         result = list()
         for element in xml_elements:
-            item = self._init_tech_position(element)
+            item = serializers.TechPositionSerializer.init_from_xml(element)
             item.object_id = operation_object.object_id
             result.append(item)
 
+            item.properties = self._get_extra_elements(element, 'Характеристики')
+            item.fact_repairs = self._get_extra_elements(element, 'ИсторияРемонтов')
+            item.plan_repairs = self._get_extra_elements(element, 'ПредстоящиеРемонты')
+            item.failures = self._get_extra_elements(element, 'Отказы')
+            item.parts = self._get_extra_elements(element, 'Запчасти')
+
         return result
 
-    def get_new_object_repair_group(self, operation_object: entities.OperationObject) -> Sequence[entities.ObjectRepairGroup]:
-        xml_elements = xml_file.GetElementsByParent(self._elements).execute(operation_object.toir_id, 'object_repair_group')
+    def get_new_object_repair_group(
+            self,
+            operation_object: entities.OperationObject) -> Sequence[entities.ObjectRepairGroup]:
+        xml_elements = xml_file.GetElementsByParent(self._elements).execute(operation_object.toir_id,
+                                                                            'object_repair_group')
         result = list()
         for element in xml_elements:
-            item = self._init_object_repair_group(element)
+            item = serializers.ObjectRepairGroupSerializer.init_from_xml(element)
             item.object_id = operation_object.object_id
             result.append(item)
 
         return result
 
     @staticmethod
-    def _init_equipment(element) -> entities.Equipment:
-
-        toir_id = element.find('РеквизитыОР/ОбъектРемонта').text
-        level = int(element.find('РеквизитыОР/УровеньГруппы').text)
-        parent = element.find('РеквизитыОР/ОбъектРемонта_Родитель').text
-        name = element.find('РеквизитыОР/ОбъектРемонтаНаименование').text
-        tech_number = element.find('РеквизитыОР/ТехНомер').text
-        toir_url = element.find('РеквизитыОР/СсылкаОР').text
-        registration_number = element.find('РеквизитыОР/РегистрационныйНомер').text
-        commodity_producer = element.find('РеквизитыОР/Изготовитель').text
-        commodity_number = element.find('РеквизитыОР/ЗаводскойНомер').text
-        category = element.find('РеквизитыОР/КатегорияОборудования').text
-        operation_date = element.find('РеквизитыОР/ДатаВводаВЭксплуатацию').text
-        departament_id = element.find('РеквизитыОР/ПодразделениеВладелец').text
-        object_type_id = element.find('РеквизитыОР/ТиповойОР').text
-        operating = element.find('Наработка/Значение').text
-
-        if operation_date:
-            operation_date = datetime.strptime(operation_date, '%Y-%m-%dT%H:%M:%S')
-
-        repair_object = entities.Equipment(
-            toir_id=toir_id,
-            level=level,
-            parent_toir_id=parent,
-            name=name,
-            operating=operating,
-            tech_number=tech_number,
-            toir_url=toir_url,
-            registration_number=registration_number,
-            commodity_producer=commodity_producer,
-            commodity_number=commodity_number,
-            operation_date=operation_date,
-            departament_id=departament_id,
-            object_type_id=object_type_id,
-            category=category,
-        )
-        return repair_object
-
-    @staticmethod
-    def _init_object_repair_group(element) -> entities.ObjectRepairGroup:
-        toir_id = element.find('РеквизитыОР/ОбъектРемонта').text
-        level = int(element.find('РеквизитыОР/УровеньГруппы').text)
-        parent = element.find('РеквизитыОР/ОбъектРемонта_Родитель').text
-        name = element.find('РеквизитыОР/ОбъектРемонтаНаименование').text
-        toir_url = element.find('РеквизитыОР/СсылкаОР').text
-        departament_id = element.find('РеквизитыОР/ПодразделениеВладелец').text
-
-        repair_object = entities.ObjectRepairGroup(
-            toir_id=toir_id,
-            level=level,
-            parent_toir_id=parent,
-            name=name,
-            toir_url=toir_url,
-            departament_id=departament_id,
-        )
-        return repair_object
-
-    @staticmethod
-    def _init_tech_position(element) -> entities.TechPosition:
-
-        toir_id = element.find('РеквизитыОР/ОбъектРемонта').text
-        level = int(element.find('РеквизитыОР/УровеньГруппы').text)
-        parent = element.find('РеквизитыОР/ОбъектРемонта_Родитель').text
-        name = element.find('РеквизитыОР/ОбъектРемонтаНаименование').text
-        tech_number = element.find('РеквизитыОР/ТехНомер').text
-        toir_url = element.find('РеквизитыОР/СсылкаОР').text
-        departament_id = element.find('РеквизитыОР/ПодразделениеВладелец').text
-
-        repair_object = entities.TechPosition(
-            toir_id=toir_id,
-            level=level,
-            parent_toir_id=parent,
-            name=name,
-            tech_number=tech_number,
-            toir_url=toir_url,
-            departament_id=departament_id,
-        )
-        return repair_object
+    def _get_extra_elements(host_element, tag: str) -> list:
+        serializers_objects = {
+            'Характеристики': serializers.PropertySerializer.init_from_xml,
+            'ИсторияРемонтов': serializers.FactRepairSerializer.init_from_xml,
+            'ПредстоящиеРемонты': serializers.PlanRepairSerializer.init_from_xml,
+            'Отказы': serializers.FailureSerializer.init_from_xml,
+            'Запчасти': serializers.PartSerializer.init_from_xml,
+        }
+        data = host_element.find(tag)
+        xml_elements = []
+        element = None
+        for child in data:
+            if child.tag == 'ОР':
+                element = ElementTree.Element(tag)
+                xml_elements.append(element)
+            if element:
+                element.append(child)
+        items = [serializers_objects.get(tag)(one) for one in xml_elements]
+        return items

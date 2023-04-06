@@ -2,11 +2,7 @@ from dataclasses import dataclass, field
 from typing import List, Literal
 from datetime import datetime
 
-from .equipment_part import EquipmentPart
-from .equipment_repair import EquipmentRepair
-from .equipment_failure import EquipmentFailure
-from .equipment_attribute import EquipmentAttribute
-from .equipment_movement import EquipmentMovement
+from . import nested_objects
 
 STATUS = Literal['updated', 'new', 'empty', 'not updated']
 
@@ -20,7 +16,7 @@ class Equipment:
     name: str
     operating: float
     departament_id: str
-    object_type_id: str
+    typical_object_id: str
     toir_url: str
     parent_object: object = None
     tech_number: str = None
@@ -32,12 +28,12 @@ class Equipment:
     replaced: bool = False
     object_id: str = None
 
-    attributes: List[EquipmentAttribute] = field(default_factory=list)
-    past_repairs: List[EquipmentRepair] = field(default_factory=list)
-    plan_repairs: List[EquipmentRepair] = field(default_factory=list)
-    failures: List[EquipmentFailure] = field(default_factory=list)
-    parts: List[EquipmentPart] = field(default_factory=list)
-    movements: List[EquipmentMovement] = field(default_factory=list)
+    properties: List[nested_objects.Property] = field(default_factory=list)
+    fact_repairs: List[nested_objects.FactRepair] = field(default_factory=list)
+    plan_repairs: List[nested_objects.PlanRepair] = field(default_factory=list)
+    failures: List[nested_objects.Failure] = field(default_factory=list)
+    parts: List[nested_objects.Part] = field(default_factory=list)
+    movements: List[nested_objects.Movement] = field(default_factory=list)
 
     self_id: str = None
     update_status: STATUS = 'empty'
@@ -65,7 +61,7 @@ class Equipment:
             'name': self.name,
             'operating': self.operating,
             'departament_id': self.departament_id,
-            'object_type_id': self.object_type_id,
+            'object_type_id': self.typical_object_id,
             'toir_url': self.toir_url,
             'tech_number': self.tech_number,
             'registration_number': self.registration_number,
@@ -87,7 +83,7 @@ class Equipment:
             name=data.get('name'),
             operating=data.get('operating'),
             departament_id=data.get('departament_id'),
-            object_type_id=data.get('object_type_id'),
+            typical_object_id=data.get('object_type_id'),
             toir_url=data.get('toir_url'),
             tech_number=data.get('tech_number'),
             registration_number=data.get('registration_number'),

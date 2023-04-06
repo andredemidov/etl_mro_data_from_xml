@@ -1,9 +1,8 @@
 import logging
 import os
 from datetime import datetime
-from domain import use_cases
+from domain import transformations, repositories
 import data_sources
-from repositories import Repository
 
 URL = 'https://operation.irkutskoil.ru/'
 XML_FILE_DIRECTORY = '//irkoil/dfs/WorkDATA/1C_OBMEN/ТОиР_Неосинтез/'
@@ -40,45 +39,38 @@ def start():
         aut_string = f.read()
     session = data_sources.GetSession.execute(URL, aut_string)
     try:
-        operation_object_repository = Repository()
         get_current_data_adapter = data_sources.GetCurrentDataAdapter(url=URL, session=session)
         post_data_adapter = data_sources.PostDataAdapter(url=URL, session=session)
+        operation_object_repository = repositories.OperationObjectsRepository(get_current_data_adapter)
+        logging.info(f'Total objects {len(operation_object_repository.get())}')
 
-        use_cases.GetOperationObjects(get_current_data_adapter, operation_object_repository).execute()
-        logging.info(f'Total objects {len(operation_object_repository.list())}')
-
-        for operation_object in operation_object_repository.list():
+        for operation_object in operation_object_repository.get():
             try:
                 # new data
-                new_repository = Repository()
-                use_cases.GetNewObjectRepairGroup(get_new_data_adapter, new_repository, operation_object).execute()
-                use_cases.GetNewTechPosition(get_new_data_adapter, new_repository, operation_object).execute()
-                use_cases.GetNewEquipment(get_new_data_adapter, new_repository, operation_object).execute()
+                new_repository = repositories.NewObjectsRepository(
+                    operation_object=operation_object,
+                    get_new_data_adapter=get_new_data_adapter,
+                    post_data_adapter=post_data_adapter
+                )
+                logging.info(f'new entities: {len(new_repository.get())}')
 
-                logging.info(f'new entities: {len(new_repository.list())}')
+                transformations.SetParentReference(operation_object=operation_object, repository=new_repository).execute()
 
-                use_cases.SetParentReference(operation_object=operation_object, repository=new_repository).execute()
+                # current data
+                current_repository = repositories.CurrentObjectsRepository(operation_object, get_current_data_adapter)
 
-                current_repository = Repository()
-                use_cases.GetCurrentObjectRepairGroup(
-                    get_current_data_adapter,
-                    current_repository
-                ).execute(operation_object)
-                use_cases.GetCurrentTechPosition(get_current_data_adapter, current_repository).execute(operation_object)
-                use_cases.GetCurrentEquipment(get_current_data_adapter, current_repository).execute(operation_object)
-
-                use_cases.MapNewAndCurrentEntities(
+                transformations.MatchNewAndCurrentEntities(
                     new_entities_repository=new_repository,
                     current_entities_repository=current_repository,
                 ).execute()
 
                 logging.info('creating and updating')
-                statistic = use_cases.SaveEntities(post_data_adapter, new_repository).execute()
+                statistic = new_repository.save()
                 log_statistic(statistic)
 
                 # delete
                 logging.info('deleting')
-                statistic = use_cases.DeleteEntities(post_data_adapter, new_repository).execute()
+                statistic = new_repository.delete()
                 log_statistic(statistic)
             except Exception as e:
                 print(e)
