@@ -1,4 +1,3 @@
-from typing import Literal
 from domain import entities
 from . import neosintez_gateway
 from .. import serializers
@@ -6,7 +5,7 @@ from .. import serializers
 
 class GetCurrentDataAdapter(neosintez_gateway.NeosintezGateway):
 
-    OBJECTS = Literal[
+    OBJECTS = [
         'operation_object',
         'equipment',
         'tech_position',
@@ -57,7 +56,7 @@ class GetCurrentDataAdapter(neosintez_gateway.NeosintezGateway):
         print('response is got', len(result))
         return result
 
-    def retrieve(self, operation_object: entities.OperationObject, retrievable_object: OBJECTS) -> list:
+    def retrieve(self, operation_object: entities.OperationObject, retrievable_object: str) -> list:
         if retrievable_object not in self.OBJECTS:
             raise TypeError(f'{retrievable_object} is not available')
         retrievable_objects = {
@@ -112,14 +111,19 @@ class GetCurrentDataAdapter(neosintez_gateway.NeosintezGateway):
             self,
             operation_object: entities.OperationObject,
             items: list,
-            retrievable_nested_object: OBJECTS,
+            retrievable_nested_object: str,
             attribute_name: str
     ):
+        if retrievable_nested_object not in self.OBJECTS:
+            raise TypeError(f'{retrievable_nested_object} is not available')
         nested_objects = self.retrieve(operation_object, retrievable_nested_object)
         nested_objects_dict = {}
         nested_objects_hosts = set(map(lambda x: x.host_id, nested_objects))
         for host in nested_objects_hosts:
             nested_objects_dict[host] = list(filter(lambda x: x.host_id == host, nested_objects))
 
+        items = list(filter(lambda x: hasattr(x, attribute_name), items))
         for item in items:
-            getattr(item, attribute_name).extend(nested_objects_dict[item.self_id])
+            item_nested_objects = nested_objects_dict.get(item.self_id)
+            if item_nested_objects:
+                setattr(item, attribute_name, item_nested_objects)

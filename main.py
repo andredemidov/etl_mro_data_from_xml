@@ -61,6 +61,10 @@ def start():
                 statistic = new_repository.save()
                 log_statistic(statistic)
 
+                logging.info('creating and updating nested objects')
+                statistic = new_repository.save_nested_objects()
+                log_statistic(statistic)
+
                 # delete
                 logging.info('deleting')
                 statistic = new_repository.delete()

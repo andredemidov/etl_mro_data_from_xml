@@ -34,10 +34,20 @@ class CurrentObjectsRepository(Repository):
             self.add(items)
 
         # nested objects
-        nested_objects = ['property', 'plan_repair', 'fact_repair', 'failure', 'part']
+        nested_objects = [
+            {'nested_object': 'property', 'attribute_name': 'properties'},
+            {'nested_object': 'plan_repair', 'attribute_name': 'plan_repairs'},
+            {'nested_object': 'fact_repair', 'attribute_name': 'fact_repairs'},
+            {'nested_object': 'failure', 'attribute_name': 'failures'},
+            {'nested_object': 'part', 'attribute_name': 'parts'},
+        ]
         for nested_object in nested_objects:
-            self._get_current_data_adapter.join_nested_objects_to_entities(self._operation_object, self._entries,
-                                                                           nested_object)
+            self._get_current_data_adapter.join_nested_objects_to_entities(
+                operation_object=self._operation_object,
+                items=self._entries,
+                retrievable_nested_object=nested_object['nested_object'],
+                attribute_name=nested_object['attribute_name'],
+            )
 
 
 class OperationObjectsRepository(Repository):
@@ -67,7 +77,7 @@ class NewObjectsRepository(Repository):
         tech_position = self._get_new_data_adapter.get_new_tech_position(self._operation_object)
         self.add(tech_position)
 
-    def save(self):
+    def save(self) -> dict:
         statistic = {'success': 0, 'error': 0}
         actions = {
             'updated': self._post_data_adapter.update,
@@ -80,8 +90,24 @@ class NewObjectsRepository(Repository):
             if action:
                 status = action(item)
                 statistic[status] += 1
-            if item.replaced:
+            if hasattr(item, 'replaced') and item.replaced:
                 self._post_data_adapter.replace(item)
+        return statistic
+
+    def save_nested_objects(self) -> dict:
+        statistic = {'success': 0, 'error': 0}
+        actions = {
+            'updated': self._post_data_adapter.update_nested_object,
+            'new': self._post_data_adapter.create_nested_object,
+        }
+        host_items = self.get()
+        for host_item in host_items:
+            for nested_items in host_item.get_nested_objects():
+                for item in nested_items:
+                    action = actions.get(item.update_status)
+                    if action:
+                        status = action(item)
+                        statistic[status] += 1
         return statistic
 
     def delete(self):
