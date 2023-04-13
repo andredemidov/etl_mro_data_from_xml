@@ -100,7 +100,8 @@ class NewObjectsRepository(Repository):
             'updated': self._post_data_adapter.update_nested_object,
             'new': self._post_data_adapter.create_nested_object,
         }
-        host_items = self.get()
+        # get only relevant (not for delete) host items
+        host_items = list(filter(lambda x: x.update_status != 'empty', self.get()))
         for host_item in host_items:
             for nested_items in host_item.get_nested_objects():
                 for item in nested_items:
@@ -116,4 +117,15 @@ class NewObjectsRepository(Repository):
         for entity in entities_for_delete:
             status = self._post_data_adapter.delete(entity)
             statistic[status] += 1
+        return statistic
+
+    def delete_nested_objects(self):
+        statistic = {'success': 0, 'error': 0}
+        host_items = list(filter(lambda x: x.update_status != 'empty', self.get()))
+        for host_item in host_items:
+            for nested_items in host_item.get_nested_objects():
+                nested_items_for_delete = list(filter(lambda x: x.update_status == 'empty', nested_items))
+                for item in nested_items_for_delete:
+                    status = self._post_data_adapter.delete_nested_object(item)
+                    statistic[status] += 1
         return statistic

@@ -69,6 +69,11 @@ def start():
                 logging.info('deleting')
                 statistic = new_repository.delete()
                 log_statistic(statistic)
+
+                logging.info('deleting nested objects')
+                statistic = new_repository.delete_nested_objects()
+                log_statistic(statistic)
+
             except Exception as e:
                 print(e)
                 logging.exception('Exception occurred')
