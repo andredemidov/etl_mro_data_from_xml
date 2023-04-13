@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal
+from . import reference_attribute
 
 STATUS = Literal['updated', 'new', 'empty', 'not updated']
 
@@ -11,8 +12,7 @@ class ObjectRepairGroup:
     parent_toir_id: str
     name: str
     toir_url: str
-    departament_id: str = ''
-    departament_name: str = ''
+    departament: reference_attribute.ReferenceAttribute
     parent_object = None
     self_id: str = None
     replaced: bool = False
@@ -25,6 +25,7 @@ class ObjectRepairGroup:
             'name': self.name,
             'toir_url': self.toir_url,
             'object_id': self.object_id,
+            'departament': self.departament.comparison_value,
         }
 
     def to_dict(self) -> dict:
@@ -33,7 +34,7 @@ class ObjectRepairGroup:
             'level': self.level,
             'parent_toir_id': self.parent_toir_id,
             'name': self.name,
-            'departament_id': self.departament_id,
+            'departament_id': self.departament.toir_id,
             'toir_url': self.toir_url,
             'self_id': self.self_id,
             'update_status': self.update_status,
@@ -47,7 +48,7 @@ class ObjectRepairGroup:
             level=data.get('level'),
             parent_toir_id=data.get('parent_toir_id'),
             name=data.get('name'),
-            departament_id=data.get('departament_id'),
+            departament=data.get('departament_id'),
             toir_url=data.get('toir_url'),
             self_id=data.get('self_id'),
             replaced=data.get('replaced'),

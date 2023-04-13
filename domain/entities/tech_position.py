@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal
+from . import reference_attribute
 
 STATUS = Literal['updated', 'replaced', 'new', 'empty', 'delete', 'not updated']
 
@@ -11,7 +12,7 @@ class TechPosition:
     level: int
     parent_toir_id: str
     name: str
-    departament_id: str
+    departament: reference_attribute.ReferenceAttribute
     toir_url: str
     parent_object: object = None
     tech_number: str = None
@@ -28,6 +29,7 @@ class TechPosition:
             'toir_url': self.toir_url,
             'tech_number': self.tech_number,
             'object_id': self.object_id,
+            'departament': self.departament.comparison_value,
         }
 
     def to_dict(self) -> dict:
@@ -36,7 +38,7 @@ class TechPosition:
             'level': self.level,
             'parent_toir_id': self.parent_toir_id,
             'name': self.name,
-            'departament_id': self.departament_id,
+            'departament_id': self.departament.toir_id,
             'toir_url': self.toir_url,
             'tech_number': self.tech_number,
             'self_id': self.self_id,
@@ -51,7 +53,7 @@ class TechPosition:
             level=data.get('level'),
             parent_toir_id=data.get('parent_toir_id'),
             name=data.get('name'),
-            departament_id=data.get('departament_id'),
+            departament=reference_attribute.ReferenceAttribute(toir_id=data.get('departament_id')),
             toir_url=data.get('toir_url'),
             tech_number=data.get('tech_number'),
             self_id=data.get('self_id'),

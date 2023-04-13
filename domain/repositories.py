@@ -30,8 +30,14 @@ class CurrentObjectsRepository(Repository):
     def _get_data_from_source(self):
         objects = ['object_repair_group', 'tech_position', 'equipment']
         for object_type in objects:
-            items = self._get_current_data_adapter.retireve(self._operation_object, object_type)
+            items = self._get_current_data_adapter.retrieve(self._operation_object, object_type)
             self.add(items)
+
+        # nested objects
+        nested_objects = ['property', 'plan_repair', 'fact_repair', 'failure', 'part']
+        for nested_object in nested_objects:
+            self._get_current_data_adapter.join_nested_objects_to_entities(self._operation_object, self._entries,
+                                                                           nested_object)
 
 
 class OperationObjectsRepository(Repository):
@@ -67,15 +73,15 @@ class NewObjectsRepository(Repository):
             'updated': self._post_data_adapter.update,
             'new': self._post_data_adapter.create,
         }
-        entities = self.get()
-        entities.sort(key=lambda x: x.level)
-        for entity in entities:
-            action = actions.get(entity.update_status)
+        items = self.get()
+        items.sort(key=lambda x: x.level)
+        for item in items:
+            action = actions.get(item.update_status)
             if action:
-                status = action(entity)
+                status = action(item)
                 statistic[status] += 1
-            if entity.replaced:
-                self._post_data_adapter.replace(entity)
+            if item.replaced:
+                self._post_data_adapter.replace(item)
         return statistic
 
     def delete(self):

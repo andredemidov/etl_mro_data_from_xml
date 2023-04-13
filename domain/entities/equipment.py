@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Literal
 from datetime import datetime
-
-from . import nested_objects
+from . import nested_objects, reference_attribute
 
 STATUS = Literal['updated', 'new', 'empty', 'not updated']
 
@@ -15,8 +14,8 @@ class Equipment:
     parent_toir_id: str
     name: str
     operating: float
-    departament_id: str
-    typical_object_id: str
+    departament: reference_attribute.ReferenceAttribute
+    typical_object: reference_attribute.ReferenceAttribute
     toir_url: str
     parent_object: object = None
     tech_number: str = None
@@ -24,7 +23,7 @@ class Equipment:
     commodity_producer: str = None
     commodity_number: str = None
     operation_date: datetime = None
-    category: str = None
+    category: reference_attribute.ReferenceAttribute = None
     replaced: bool = False
     object_id: str = None
 
@@ -41,6 +40,15 @@ class Equipment:
     def __str__(self):
         return f'ОР: {self.name}, guid: {self.toir_id}'
 
+    def get_nested_objects(self):
+        return [
+            self.properties,
+            self.fact_repairs,
+            self.plan_repairs,
+            self.failures,
+            self.parts,
+        ]
+
     def to_compare_dict(self) -> dict:
         return {
             'toir_id': self.toir_id,
@@ -51,6 +59,9 @@ class Equipment:
             'commodity_producer': self.commodity_producer,
             'commodity_number': self.commodity_number,
             'object_id': self.object_id,
+            'departament': self.departament.comparison_value,
+            'typical_object': self.typical_object.comparison_value,
+            'category': self.category.comparison_value,
         }
 
     def to_dict(self) -> dict:
@@ -60,15 +71,15 @@ class Equipment:
             'parent_toir_id': self.parent_toir_id,
             'name': self.name,
             'operating': self.operating,
-            'departament_id': self.departament_id,
-            'object_type_id': self.typical_object_id,
+            'departament_id': self.departament.toir_id,
+            'object_type_id': self.typical_object.toir_id,
             'toir_url': self.toir_url,
             'tech_number': self.tech_number,
             'registration_number': self.registration_number,
             'commodity_producer': self.commodity_producer,
             'commodity_number': self.commodity_number,
             'operation_date': self.operation_date,
-            'category': self.category,
+            'category': self.category.value,
             'self_id': self.self_id,
             'update_status': self.update_status,
             'replaced': self.replaced,
@@ -82,8 +93,8 @@ class Equipment:
             parent_toir_id=data.get('parent_toir_id'),
             name=data.get('name'),
             operating=data.get('operating'),
-            departament_id=data.get('departament_id'),
-            typical_object_id=data.get('object_type_id'),
+            departament=data.get('departament_id'),
+            typical_object=data.get('object_type_id'),
             toir_url=data.get('toir_url'),
             tech_number=data.get('tech_number'),
             registration_number=data.get('registration_number'),

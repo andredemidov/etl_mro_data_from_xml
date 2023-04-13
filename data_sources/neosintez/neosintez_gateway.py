@@ -103,7 +103,7 @@ class NeosintezGateway:
         req_url = self._url + f'api/objects/{item_id}/parent?parentId={parent_item_id}'
         return self._session.put(req_url)
 
-    def _get_id_by_key(self, parent_id, class_id, value, attribute_value_id, create=False, name=None):
+    def _get_id_by_name(self, parent_id, class_id, name):
         req_url = self._url + 'api/objects/search?take=30'
         payload = json.dumps({
             "Filters": [
@@ -118,10 +118,9 @@ class NeosintezGateway:
             ],
             "Conditions": [
                 {
-                    'Value': value,
+                    'Value': name,
                     'Operator': 1,
-                    'Type': 1,
-                    'Attribute': attribute_value_id,
+                    'Type': 2,
                 }
             ]
         })
@@ -130,17 +129,7 @@ class NeosintezGateway:
         if response.status_code == 200 and response_text['Total'] == 1:
             return response_text['Result'][0]['Object']['Id']
         elif response.status_code == 200 and response_text['Total'] > 1:
-            logging.warning(f'More then one result is found for {parent_id}, class id {class_id}, value {value}')
+            logging.warning(f'More then one result is found for {parent_id}, class id {class_id}, value {name}')
             return None
-        elif create:
-            item_id = self.create_item(parent_id)
-            request_body = [{
-                'Name': 'forvalidation',
-                'Value': value,
-                'Type': 2,
-                'Id': attribute_value_id
-            }]
-            self.put_attributes(item_id, request_body)
-            return item_id
         else:
             return None

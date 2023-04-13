@@ -105,4 +105,21 @@ class GetCurrentDataAdapter(neosintez_gateway.NeosintezGateway):
         else:
             data = self._get_data(root_id=operation_object.self_id, class_id=class_id)
         items = [serializer.init_from_neosintez(item) for item in data]
+
         return items
+
+    def join_nested_objects_to_entities(
+            self,
+            operation_object: entities.OperationObject,
+            items: list,
+            retrievable_nested_object: OBJECTS,
+            attribute_name: str
+    ):
+        nested_objects = self.retrieve(operation_object, retrievable_nested_object)
+        nested_objects_dict = {}
+        nested_objects_hosts = set(map(lambda x: x.host_id, nested_objects))
+        for host in nested_objects_hosts:
+            nested_objects_dict[host] = list(filter(lambda x: x.host_id == host, nested_objects))
+
+        for item in items:
+            getattr(item, attribute_name).extend(nested_objects_dict[item.self_id])

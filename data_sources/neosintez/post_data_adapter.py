@@ -6,6 +6,9 @@ from .. import serializers
 
 class PostDataAdapter(neosintez_gateway.NeosintezGateway):
 
+    # dict like {attribute_id: {value: reference_id}}
+    REFERENCE_ATTRIBUTES_VALUES = {}
+
     def update(self, item: (entities.Equipment, entities.TechPosition, entities.ObjectRepairGroup)) -> str:
         if isinstance(item, entities.ObjectRepairGroup):
             put_request_body = serializers.ObjectRepairGroupSerializer.get_update_request_body(item)
@@ -69,6 +72,8 @@ class PostDataAdapter(neosintez_gateway.NeosintezGateway):
         return status
 
     def create(self, item: (entities.Equipment, entities.TechPosition, entities.ObjectRepairGroup)) -> str:
+        self._get_reference_attribute_value(item)
+
         if isinstance(item, entities.ObjectRepairGroup):
             create_request_body = serializers.ObjectRepairGroupSerializer.get_create_request_body(item)
             put_request_body = serializers.ObjectRepairGroupSerializer.get_update_request_body(item)
@@ -92,6 +97,8 @@ class PostDataAdapter(neosintez_gateway.NeosintezGateway):
         return status
 
     def create_nested_object(self, item) -> str:
+        self._get_reference_attribute_value(item)
+        
         if isinstance(item, entities.nested_objects.Property):
             create_request_body, collection_attribute_id = serializers.PropertySerializer.get_create_request_body(item)
         elif isinstance(item, entities.nested_objects.PlanRepair):
@@ -113,17 +120,28 @@ class PostDataAdapter(neosintez_gateway.NeosintezGateway):
             status = 'error'
         return status
 
-    def _get_reference_attribute_value(self, request_body: (dict, list[dict])):
-        if isinstance(request_body, dict):
-            reference_attributes = list(filter(lambda x: x['Type'] == 8, request_body['Attributes'].values()))
-        else:
-            reference_attributes = list(filter(lambda x: x['Type'] == 8, request_body))
+    def _get_reference_attribute_value(self, item):
+        reference_attributes: list[entities.ReferenceAttribute] = list(
+            filter(lambda x: isinstance(x, entities.ReferenceAttribute), item.__dict__.values()))
+
+        # filter attributes where reference_id already exists
+        reference_attributes = list(filter(lambda x: not x.reference_id, reference_attributes))
+        # filter attributes where value from toir don't exist
+        reference_attributes = list(filter(lambda x: x.value, reference_attributes))
 
         for attribute in reference_attributes:
-            attribute_id = attribute['Id']
-            value = attribute['Value']
-            class_id = serializers.Serializer.reference_attributes['class_id']
-            folder_id = serializers.Serializer.reference_attributes['folder_id']
-            reference_id = self._get_id_by_key(folder_id, class_id, value, attribute_id)
-            if reference_id:
-                attribute['Value'] = {'Id': reference_id, 'Name': 'forvalidation'}
+            attribute_id = attribute.attribute_id
+            value = attribute.value
+            # check whether reference_id already exists
+            values = self.REFERENCE_ATTRIBUTES_VALUES.get(attribute_id)
+            reference_id = values.get(value) if values else None
+            # if there is no reference_id for that value get it from neosintez
+            if not reference_id:
+                class_id = serializers.Serializer.reference_attributes[attribute_id]['class_id']
+                folder_id = serializers.Serializer.reference_attributes[attribute_id]['folder_id']
+                reference_id = self._get_id_by_name(folder_id, class_id, value)
+                # check whether reference_id is got and save it to reduce requests
+                if reference_id:
+                    self.REFERENCE_ATTRIBUTES_VALUES.setdefault(attribute_id, {})
+                    self.REFERENCE_ATTRIBUTES_VALUES[attribute_id][value] = reference_id
+                    attribute.reference_id = reference_id
