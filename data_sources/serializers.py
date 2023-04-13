@@ -3,7 +3,7 @@ from domain import entities
 
 
 class Serializer:
-    # TODO: specify id
+
     equipment_class_id = '98a4bfa3-0929-e811-810d-c4afdb1aea70'
     tech_position_class_id = '379086c1-575b-ed11-914d-005056b6948b'
     object_repair_group_class_id = '9e8f1a26-778d-e811-810f-edf0bf5e0091'
@@ -27,52 +27,56 @@ class Serializer:
     category_attribute_id = '2daf9add-0a29-e811-810d-c4afdb1aea70'
 
     # collection classes
-    failure_collection_class_id = ''
-    part_collection_class_id = ''
-    property_collection_class_id = ''
-    fact_repair_collection_class_id = ''
-    plan_repair_collection_class_id = ''
+    failure_collection_class_id = 'e483b423-1131-e811-810f-edf0bf5e0091'
+    part_collection_class_id = '96d11c5b-8e80-eb11-9113-005056b6948b'
+    property_collection_class_id = 'f9ed1ca9-5349-e811-810f-edf0bf5e0091'
+    fact_repair_collection_class_id = '4427f4a0-af5d-e811-810f-edf0bf5e0091'
+    plan_repair_collection_class_id = '053cdbdb-3c33-e811-810f-edf0bf5e0091'
 
     # collection attributes
-    failure_collection_attribute_id = ''
-    part_collection_attribute_id = ''
-    property_collection_attribute_id = ''
-    fact_repair_collection_attribute_id = ''
-    plan_repair_collection_attribute_id = ''
+    failure_collection_attribute_id = '909f260f-6333-e811-810f-edf0bf5e0091'
+    part_collection_attribute_id = '86faae6e-5747-ec11-9117-005056b6948b'
+    property_collection_attribute_id = '=170c062a-5c49-e811-810f-edf0bf5e0091'
+    fact_repair_collection_attribute_id = '3b42cbc3-bd5d-e811-810f-edf0bf5e0091'
+    plan_repair_collection_attribute_id = 'e56f151e-7641-e811-810f-edf0bf5e0091'
 
     # collection objects attributes
-    failure_description_attribute_id = ''
-    failure_date_attribute_id = ''
-    type_reason_failure_attribute_id = ''
-    type_failure_attribute_id = ''
+    failure_description_attribute_id = 'a22c722a-6233-e811-810f-edf0bf5e0091'  # - 2
+    failure_date_attribute_id = 'b4b819ba-6133-e811-810f-edf0bf5e0091'  # - 3
+    type_reason_failure_attribute_id = 'a882a0e6-6133-e811-810f-edf0bf5e0091'
+    type_failure_attribute_id = '6c83117f-1131-e811-810f-edf0bf5e0091'
 
-    unit_attribute_id = ''
-    amount_attribute_id = ''
-    code_attribute_id = ''
+    unit_attribute_id = '21e9cd03-5207-e811-810c-9ec54093bb77'  # - 2
+    amount_attribute_id = '1aa7531e-9080-eb11-9113-005056b6948b'
+    code_attribute_id = '8182cfff-8f80-eb11-9113-005056b6948b'
     name_repair_attribute_id = ''
-    type_repair_attribute_id = ''
+    type_repair_attribute_id = '2c93c947-3d33-e811-810f-edf0bf5e0091'
+    part_name_attribute_id = '0830a7cd-8f80-eb11-9113-005056b6948b'
 
-    property_value_attribute_id = ''
-    property_attribute_id = ''
+    property_value_attribute_id = 'c70cdba4-5c49-e811-810f-edf0bf5e0091'  # - 2
+    property_attribute_id = '9c6a07e3-5b49-e811-810f-edf0bf5e0091'
 
-    repair_id_attribute_id = ''
-    repair_start_date_attribute_id = ''
-    repair_finish_date_attribute_id = ''
+    repair_id_attribute_id = '90b90a17-b4e3-ea11-9110-005056b6948b'
+    repair_start_date_attribute_id = '9ba8c224-3d33-e811-810f-edf0bf5e0091'  # - 3
+    repair_finish_date_attribute_id = '79b54cb4-3f33-e811-810f-edf0bf5e0091'
+    plan_url_attribute_id = '3e004f4b-f264-e811-810f-edf0bf5e0091'
+    act_url_attribute_id = '48d84614-f264-e811-810f-edf0bf5e0091'  # 6
+    operating_value_attribute_id = '5dfd213a-4133-e811-810f-edf0bf5e0091' # 2
 
     reference_attributes = {
         departament_id_attribute_id: {
-            'folder_id': '',
-            'class_id': '',
+            'folder_id': 'f558614f-e430-e811-810f-edf0bf5e0091',
+            'class_id': '5f50ea6b-5627-e811-810c-9ec54093bb77',
             # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         },
         category_attribute_id: {
-            'folder_id': '',
-            'class_id': '',
+            'folder_id': 'e0f6bda7-0829-e811-810d-c4afdb1aea70',
+            'class_id': '6285225b-5727-e811-810c-9ec54093bb77',
             # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         },
         type_failure_attribute_id: {
-            'folder_id': '',
-            'class_id': '',
+            'folder_id': '512847aa-f730-e811-810f-edf0bf5e0091',
+            'class_id': '5f50ea6b-5627-e811-810c-9ec54093bb77',
             # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         },
         unit_attribute_id: {
@@ -81,13 +85,13 @@ class Serializer:
             # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         },
         type_repair_attribute_id: {
-            'folder_id': '',
-            'class_id': '',
+            'folder_id': '0d84ecc4-f730-e811-810f-edf0bf5e0091',
+            'class_id': '5f50ea6b-5627-e811-810c-9ec54093bb77',
             # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         },
         property_attribute_id: {
-            'folder_id': '',
-            'class_id': '',
+            'folder_id': '69c6f051-2633-e811-810f-edf0bf5e0091',
+            'class_id': '70806174-2633-e811-810f-edf0bf5e0091',
             # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         },
     }
@@ -641,7 +645,7 @@ class FailureSerializer(Serializer):
             {
                 'Name': 'forvalidation',
                 'Value': item.failure_description if item.failure_description else None,
-                'Type': 2,  # TODO: check type of attr in neosintez
+                'Type': 2,
                 'Id': cls.failure_description_attribute_id
             },
             {
@@ -709,7 +713,7 @@ class PartSerializer(Serializer):
         host_id = item['Object']['HostObjectId']
 
         toir_id = cls._get_value(attributes, cls.toir_id_attribute_id)
-        name = cls._get_value(attributes, cls.name_attribute_id)
+        name = cls._get_value(attributes, cls.part_name_attribute_id)
         unit = cls._get_value(attributes, cls.unit_attribute_id)
         amount = cls._get_value(attributes, cls.amount_attribute_id)
         code = cls._get_value(attributes, cls.code_attribute_id)
@@ -757,8 +761,8 @@ class PartSerializer(Serializer):
             {
                 'Name': 'forvalidation',
                 'Value': item.name if item.name else None,
-                'Type': 2,  # TODO: check type of attr in neosintez
-                'Id': cls.name_attribute_id
+                'Type': 2,
+                'Id': cls.part_name_attribute_id
             },
             {
                 'Name': 'forvalidation',
@@ -856,7 +860,7 @@ class PropertySerializer(Serializer):
             {
                 'Name': 'forvalidation',
                 'Value': item.value if item.value else None,
-                'Type': 2,  # TODO: check type of attr in neosintez
+                'Type': 2,
                 'Id': cls.property_value_attribute_id
             },
             {
@@ -900,10 +904,10 @@ class FactRepairSerializer(Serializer):
 
         toir_id = cls._get_value(attributes, cls.toir_id_attribute_id)
         repair_id = cls._get_value(attributes, cls.repair_id_attribute_id, get_only_id=True)
-        toir_url = cls._get_value(attributes, cls.toir_url_attribute_id)
+        toir_url = cls._get_value(attributes, cls.act_url_attribute_id)
         fact_start_date = cls._get_value(attributes, cls.repair_start_date_attribute_id)
         fact_finish_date = cls._get_value(attributes, cls.repair_finish_date_attribute_id)
-        operating = cls._get_value(attributes, cls.operating_attribute_id)
+        operating = cls._get_value(attributes, cls.operating_value_attribute_id)
         type_repair_id = cls._get_value(attributes, cls.type_repair_attribute_id, get_only_id=True)
         type_repair_name = cls._get_value(attributes, cls.type_repair_attribute_id)
 
@@ -947,20 +951,20 @@ class FactRepairSerializer(Serializer):
             {
                 'Name': 'forvalidation',
                 'Value': item.fact_start_date if item.fact_start_date else None,
-                'Type': 3,  # TODO: check type of attr in neosintez
+                'Type': 3,
                 'Id': cls.repair_start_date_attribute_id
             },
             {
                 'Name': 'forvalidation',
                 'Value': item.fact_finish_date if item.fact_finish_date else None,
-                'Type': 3,  # TODO: check type of attr in neosintez
+                'Type': 3,
                 'Id': cls.repair_finish_date_attribute_id
             },
             {
                 'Name': 'forvalidation',
                 'Value': item.operating if item.operating else None,
-                'Type': 1,
-                'Id': cls.operating_attribute_id
+                'Type': 2,
+                'Id': cls.operating_value_attribute_id
             },
             {
                 'Name': 'forvalidation',
@@ -973,6 +977,12 @@ class FactRepairSerializer(Serializer):
                 'Value': item.type_repair.request_value,
                 'Type': 8,
                 'Id': cls.type_repair_attribute_id
+            },
+            {
+                'Name': 'forvalidation',
+                'Value': item.toir_url,
+                'Type': 6,
+                'Id': cls.act_url_attribute_id
             },
         ]
         return put_request_body
@@ -1012,7 +1022,7 @@ class PlanRepairSerializer(Serializer):
 
         toir_id = cls._get_value(attributes, cls.toir_id_attribute_id)
         repair_id = cls._get_value(attributes, cls.repair_id_attribute_id, get_only_id=True)
-        toir_url = cls._get_value(attributes, cls.toir_url_attribute_id)
+        toir_url = cls._get_value(attributes, cls.plan_url_attribute_id)
         start_date = cls._get_value(attributes, cls.repair_start_date_attribute_id)
         finish_date = cls._get_value(attributes, cls.repair_finish_date_attribute_id)
         type_repair_id = cls._get_value(attributes, cls.type_repair_attribute_id, get_only_id=True)
@@ -1067,13 +1077,13 @@ class PlanRepairSerializer(Serializer):
             {
                 'Name': 'forvalidation',
                 'Value': item.start_date if item.start_date else None,
-                'Type': 3,  # TODO: check type of attr in neosintez
+                'Type': 3,
                 'Id': cls.repair_start_date_attribute_id
             },
             {
                 'Name': 'forvalidation',
                 'Value': item.finish_date if item.finish_date else None,
-                'Type': 3,  # TODO: check type of attr in neosintez
+                'Type': 3,
                 'Id': cls.repair_finish_date_attribute_id
             },
             {
@@ -1081,6 +1091,12 @@ class PlanRepairSerializer(Serializer):
                 'Value': item.type_repair.request_value,
                 'Type': 8,
                 'Id': cls.departament_id_attribute_id
+            },
+            {
+                'Name': 'forvalidation',
+                'Value': item.toir_url,
+                'Type': 6,
+                'Id': cls.plan_url_attribute_id
             },
         ]
         return put_request_body
