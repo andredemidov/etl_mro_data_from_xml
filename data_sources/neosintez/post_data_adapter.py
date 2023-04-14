@@ -10,6 +10,8 @@ class PostDataAdapter(neosintez_gateway.NeosintezGateway):
     REFERENCE_ATTRIBUTES_VALUES = {}
 
     def update(self, item: (entities.Equipment, entities.TechPosition, entities.ObjectRepairGroup)) -> str:
+        self._get_reference_attribute_value(item)
+
         if isinstance(item, entities.ObjectRepairGroup):
             put_request_body = serializers.ObjectRepairGroupSerializer.get_update_request_body(item)
         elif isinstance(item, entities.TechPosition):
@@ -27,6 +29,8 @@ class PostDataAdapter(neosintez_gateway.NeosintezGateway):
         return status
 
     def update_nested_object(self, item) -> str:
+        self._get_reference_attribute_value(item)
+
         if isinstance(item, entities.nested_objects.Property):
             put_request_body = serializers.PropertySerializer.get_update_request_body(item)
         elif isinstance(item, entities.nested_objects.PlanRepair):
@@ -134,12 +138,15 @@ class PostDataAdapter(neosintez_gateway.NeosintezGateway):
             value = attribute.value
             # check whether reference_id already exists
             values = self.REFERENCE_ATTRIBUTES_VALUES.get(attribute_id)
-            reference_id = values.get(value) if values else None
+            attribute.reference_id = values.get(value) if values else None
             # if there is no reference_id for that value get it from neosintez
-            if not reference_id:
+            if not attribute.reference_id:
                 class_id = serializers.Serializer.reference_attributes[attribute_id]['class_id']
                 folder_id = serializers.Serializer.reference_attributes[attribute_id]['folder_id']
-                reference_id = self._get_id_by_name(folder_id, class_id, value)
+                if attribute.toir_id:
+                    reference_id = self._get_id_by_key(folder_id, class_id, attribute.toir_id, attribute_id)
+                else:
+                    reference_id = self._get_id_by_name(folder_id, class_id, value)
                 # check whether reference_id is got and save it to reduce requests
                 if reference_id:
                     self.REFERENCE_ATTRIBUTES_VALUES.setdefault(attribute_id, {})
