@@ -1,4 +1,5 @@
 import logging
+from collections import Counter
 from datetime import datetime
 from domain import transformations, repositories
 import data_sources
@@ -47,7 +48,8 @@ def start():
                 )
                 logging.info(f'new entities: {len(new_repository.get())}')
 
-                transformations.SetParentReference(operation_object=operation_object, repository=new_repository).execute()
+                transformations.SetParentReference(operation_object=operation_object,
+                                                   repository=new_repository).execute()
 
                 # current data
                 current_repository = repositories.CurrentObjectsRepository(operation_object, get_current_data_adapter)
@@ -56,6 +58,9 @@ def start():
                     new_entities_repository=new_repository,
                     current_entities_repository=current_repository,
                 ).execute()
+                statuses = list(map(lambda x: x.update_status, new_repository.get()))
+                counter = Counter(statuses)
+                logging.info(f'statuses: {counter}')
 
                 logging.info('creating and updating')
                 statistic = new_repository.save()
