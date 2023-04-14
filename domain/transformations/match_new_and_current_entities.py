@@ -76,7 +76,7 @@ class MatchNewAndCurrentEntities:
                 # any new one, and it has to be deleted
                 # add such an entities to the nested objects list with status 'empty'
                 nested_for_delete = list(filter(lambda x: x.update_status == 'empty', current))
-                nested_objects_in_new.append(nested_for_delete)
+                nested_objects_in_new.extend(nested_for_delete)
         else:
             for i in range(len(new_entity.get_nested_objects())):
                 for new_object in new_entity.get_nested_objects()[i]:
