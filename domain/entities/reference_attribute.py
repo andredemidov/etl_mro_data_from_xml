@@ -4,9 +4,9 @@ from dataclasses import dataclass
 @dataclass
 class ReferenceAttribute:
     toir_id: str = ''
-    value: str = ''
-    reference_id: str = ''
-    reference_name: str = ''
+    value: str = None
+    reference_id: str = None
+    reference_name: str = None
     attribute_id: str = ''
     name: str = ''
 
