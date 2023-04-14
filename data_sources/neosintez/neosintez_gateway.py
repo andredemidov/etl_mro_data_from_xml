@@ -124,12 +124,50 @@ class NeosintezGateway:
                 }
             ]
         })
-        response = self._session.post(req_url, data=payload)
+        headers = {
+            'X-HTTP-Method-Override': 'GET'
+        }
+        response = self._session.post(req_url, headers=headers, data=payload)
         response_text = json.loads(response.text)
         if response.status_code == 200 and response_text['Total'] == 1:
             return response_text['Result'][0]['Object']['Id']
         elif response.status_code == 200 and response_text['Total'] > 1:
             logging.warning(f'More then one result is found for {parent_id}, class id {class_id}, value {name}')
+            return None
+        else:
+            return None
+
+    def _get_id_by_key(self, parent_id, class_id, value, attribute_value_id):
+        req_url = self._url + 'api/objects/search?take=30'
+        payload = json.dumps({
+            "Filters": [
+                {
+                    "Type": 4,
+                    "Value": parent_id
+                },
+                {
+                    "Type": 5,
+                    "Value": class_id
+                }
+            ],
+            "Conditions": [
+                {
+                    'Value': value,
+                    'Operator': 1,
+                    'Type': 1,
+                    'Attribute': attribute_value_id,
+                }
+            ]
+        })
+        headers = {
+            'X-HTTP-Method-Override': 'GET'
+        }
+        response = self._session.post(req_url, headers=headers, data=payload)
+        response_text = json.loads(response.text)
+        if response.status_code == 200 and response_text['Total'] == 1:
+            return response_text['Result'][0]['Object']['Id']
+        elif response.status_code == 200 and response_text['Total'] > 1:
+            logging.warning(f'More then one result is found for {parent_id}, class id {class_id}, value {value}')
             return None
         else:
             return None
