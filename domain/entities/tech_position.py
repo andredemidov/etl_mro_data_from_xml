@@ -1,6 +1,6 @@
-from dataclasses import dataclass
-from typing import Literal
-from . import reference_attribute
+from dataclasses import dataclass, field
+from typing import Literal, List
+from . import reference_attribute, nested_objects
 
 STATUS = Literal['updated', 'replaced', 'new', 'empty', 'delete', 'not updated']
 
@@ -21,6 +21,25 @@ class TechPosition:
     self_id: str = None
     update_status: STATUS = 'empty'
     object_id: str = None
+
+    properties: List[nested_objects.Property] = field(default_factory=list)
+    fact_repairs: List[nested_objects.FactRepair] = field(default_factory=list)
+    plan_repairs: List[nested_objects.PlanRepair] = field(default_factory=list)
+    failures: List[nested_objects.Failure] = field(default_factory=list)
+    parts: List[nested_objects.Part] = field(default_factory=list)
+    movements: List[nested_objects.Movement] = field(default_factory=list)
+
+    def __str__(self):
+        return f'{self.name}, {self.toir_id}'
+
+    def get_nested_objects(self):
+        return [
+            self.properties,
+            self.fact_repairs,
+            self.plan_repairs,
+            self.failures,
+            self.parts,
+        ]
 
     def to_compare_dict(self) -> dict:
         return {

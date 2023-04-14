@@ -19,6 +19,9 @@ class ObjectRepairGroup:
     update_status: STATUS = 'empty'
     object_id: str = None
 
+    def get_nested_objects(self):
+        return []
+
     def to_compare_dict(self) -> dict:
         return {
             'toir_id': self.toir_id,

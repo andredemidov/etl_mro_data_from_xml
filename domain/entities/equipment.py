@@ -38,7 +38,7 @@ class Equipment:
     update_status: STATUS = 'empty'
 
     def __str__(self):
-        return f'ОР: {self.name}, guid: {self.toir_id}'
+        return f'{self.name}, {self.toir_id}'
 
     def get_nested_objects(self):
         return [
