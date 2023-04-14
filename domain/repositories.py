@@ -57,7 +57,7 @@ class OperationObjectsRepository(Repository):
         super().__init__()
 
     def _get_data_from_source(self):
-        items = self._get_current_data_adapter.retireve(None, 'operation_object')
+        items = self._get_current_data_adapter.retrieve(None, 'operation_object')
         self.add(items)
 
 
