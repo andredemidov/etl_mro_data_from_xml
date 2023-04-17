@@ -62,6 +62,7 @@ class MatchNewAndCurrentEntities:
                     current_object = current_dict.get(new_object.unique_id)
                     if current_object:
                         new_object.self_id = current_object.self_id
+                        new_object.host_id = current_object.host_id
                         # update status
                         if new_object.to_compare_dict() != current_object.to_compare_dict():
                             new_object.update_status = 'updated'
