@@ -8,6 +8,8 @@ class PostDataAdapter(neosintez_gateway.NeosintezGateway):
 
     # dict like {attribute_id: {value: reference_id}}
     REFERENCE_ATTRIBUTES_VALUES = {}
+    # dict like {host_id: {collection_attribute_id: {self_id: delete_self_id}}}
+    HOST_COLLECTIONS_DATA = {}
 
     def update(self, item: (entities.Equipment, entities.TechPosition, entities.ObjectRepairGroup)) -> str:
         self._get_reference_attribute_value(item)
@@ -68,11 +70,36 @@ class PostDataAdapter(neosintez_gateway.NeosintezGateway):
         return status
 
     def delete_nested_object(self, item) -> str:
-        response = self.delete_item(item.self_id, item.host_id)
-        if response.status_code == 200:
-            status = 'success'
+        if isinstance(item, entities.nested_objects.Property):
+            _, collection_attribute_id = serializers.PropertySerializer.get_create_request_body(item)
+        elif isinstance(item, entities.nested_objects.PlanRepair):
+            _, collection_attribute_id = serializers.PlanRepairSerializer.get_create_request_body(item)
+        elif isinstance(item, entities.nested_objects.FactRepair):
+            _, collection_attribute_id = serializers.FactRepairSerializer.get_create_request_body(item)
+        elif isinstance(item, entities.nested_objects.Failure):
+            _, collection_attribute_id = serializers.FailureSerializer.get_create_request_body(item)
+        elif isinstance(item, entities.nested_objects.Part):
+            _, collection_attribute_id = serializers.PartSerializer.get_create_request_body(item)
         else:
-            status = 'error'
+            raise TypeError()
+        # check if data already retrieved
+        if not (item.host_id in self.HOST_COLLECTIONS_DATA
+                and collection_attribute_id in self.HOST_COLLECTIONS_DATA.get(item.host_id)):
+            response = self.get_host_collections(item.host_id, collection_attribute_id)
+            self.HOST_COLLECTIONS_DATA.setdefault(item.host_id, {})
+            self.HOST_COLLECTIONS_DATA[item.host_id].setdefault(collection_attribute_id, {})
+            if response.status_code == 200:
+                response_text = json.loads(response.text)
+                # get dict like {self_id: delete_self_id}
+                collections_data = dict(map(lambda x: (x['Object']['Id'], x['Id']), response_text['Result']))
+                self.HOST_COLLECTIONS_DATA[item.host_id][collection_attribute_id] = collections_data
+
+        delete_self_id = self.HOST_COLLECTIONS_DATA[item.host_id][collection_attribute_id].get(item.self_id)
+        status = 'error'
+        if delete_self_id:
+            response = self.delete_item(delete_self_id, item.host_id)
+            if response.status_code == 200:
+                status = 'success'
         return status
 
     def create(self, item: (entities.Equipment, entities.TechPosition, entities.ObjectRepairGroup)) -> str:
@@ -130,7 +157,7 @@ class PostDataAdapter(neosintez_gateway.NeosintezGateway):
 
         # filter attributes where reference_id already exists
         reference_attributes = list(filter(lambda x: not x.reference_id, reference_attributes))
-        # filter attributes where value from toir don't exist
+        # filter attributes where value exist
         reference_attributes = list(filter(lambda x: x.value, reference_attributes))
 
         for attribute in reference_attributes:
@@ -144,7 +171,8 @@ class PostDataAdapter(neosintez_gateway.NeosintezGateway):
                 class_id = serializers.Serializer.reference_attributes[attribute_id]['class_id']
                 folder_id = serializers.Serializer.reference_attributes[attribute_id]['folder_id']
                 if attribute.toir_id:
-                    reference_id = self._get_id_by_key(folder_id, class_id, attribute.toir_id, attribute_id)
+                    key_attribute_id = serializers.Serializer.reference_attributes[attribute_id]['key_attribute_id']
+                    reference_id = self._get_id_by_key(folder_id, class_id, attribute.toir_id, key_attribute_id)
                 else:
                     reference_id = self._get_id_by_name(folder_id, class_id, value)
                 # check whether reference_id is got and save it to reduce requests

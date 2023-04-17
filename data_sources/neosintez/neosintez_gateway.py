@@ -171,3 +171,8 @@ class NeosintezGateway:
             return None
         else:
             return None
+
+    def get_host_collections(self, host_id, collection_attribute_id):
+        req_url = self._url + f'api/objects/{host_id}/collections?attributeId={collection_attribute_id}&Take=1000'
+        response = self._session.get(req_url)
+        return response
