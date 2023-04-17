@@ -92,8 +92,7 @@ class GetNewDataAdapter:
 
         return result
 
-    @staticmethod
-    def _get_extra_elements(host_element, tag: str) -> list:
+    def _get_extra_elements(self, host_element, tag: str) -> list:
         serializers_objects = {
             'Характеристики': serializers.PropertySerializer.init_from_xml,
             'ИсторияРемонтов': serializers.FactRepairSerializer.init_from_xml,
@@ -114,6 +113,8 @@ class GetNewDataAdapter:
         # do not serialize empty objects
         xml_elements = list(filter(lambda x: len(x) > 1, xml_elements))
         items = [serializers_objects.get(tag)(one) for one in xml_elements]
+        for item in items:
+            self._get_reference_attribute_value(item)
         return items
 
     def _get_reference_attribute_value(self, item):
