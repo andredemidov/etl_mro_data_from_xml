@@ -105,6 +105,8 @@ class NewObjectsRepository(Repository):
         for host_item in host_items:
             for nested_items in host_item.get_nested_objects():
                 for item in nested_items:
+                    # before any action set host_id from host_item
+                    item.host_id = host_item.self_id
                     action = actions.get(item.update_status)
                     if action:
                         status = action(item)
