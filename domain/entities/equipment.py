@@ -61,7 +61,7 @@ class Equipment:
             'object_id': self.object_id,
             'departament': self.departament.comparison_value,
             'typical_object': self.typical_object.comparison_value,
-            'category': self.category.comparison_value,
+            # 'category': self.category.comparison_value,
         }
 
     def to_dict(self) -> dict:
