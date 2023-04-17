@@ -68,36 +68,42 @@ class Serializer:
         departament_id_attribute_id: {
             'folder_id': 'f558614f-e430-e811-810f-edf0bf5e0091',
             'class_id': '5f50ea6b-5627-e811-810c-9ec54093bb77',
-            # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         },
         category_attribute_id: {
             'folder_id': 'e0f6bda7-0829-e811-810d-c4afdb1aea70',
             'class_id': '6285225b-5727-e811-810c-9ec54093bb77',
-            # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         },
         type_failure_attribute_id: {
             'folder_id': '512847aa-f730-e811-810f-edf0bf5e0091',
             'class_id': '5f50ea6b-5627-e811-810c-9ec54093bb77',
-            # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         },
         unit_attribute_id: {
             'folder_id': '',
             'class_id': '',
-            # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+            'key_attribute_id': ''
         },
         type_repair_attribute_id: {
             'folder_id': '0d84ecc4-f730-e811-810f-edf0bf5e0091',
             'class_id': '5f50ea6b-5627-e811-810c-9ec54093bb77',
-            # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         },
         property_attribute_id: {
             'folder_id': '69c6f051-2633-e811-810f-edf0bf5e0091',
             'class_id': '70806174-2633-e811-810f-edf0bf5e0091',
-            # 'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         },
         typical_object_attribute_id: {
             'folder_id': '6c0e01c4-d025-e811-810c-9ec54093bb77',
             'class_id': 'b4b245dc-34e1-ea11-9110-005056b6948b',
+            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+        },
+        type_reason_failure_attribute_id: {
+            'folder_id': 'ebb409d7-f730-e811-810f-edf0bf5e0091',
+            'class_id': '5f50ea6b-5627-e811-810c-9ec54093bb77',
+            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
         }
     }
     dimension_files = {
@@ -123,9 +129,9 @@ class Serializer:
                 return attributes[attribute_id]['Value']['Id']
             elif item_type == 8:
                 return attributes[attribute_id]['Value']['Name']
-            elif item_type == 3:
-                value = attributes[attribute_id]['Value']
-                return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S')
+            # elif item_type == 3:
+            #     value = attributes[attribute_id]['Value']
+            #     return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S')
             elif item_type == 1:
                 return round(attributes[attribute_id]['Value'], 4)
             else:
@@ -658,12 +664,6 @@ class FailureSerializer(Serializer):
         put_request_body = [
             {
                 'Name': 'forvalidation',
-                'Value': item.toir_id if item.toir_id else None,
-                'Type': 2,
-                'Id': cls.toir_id_attribute_id
-            },
-            {
-                'Name': 'forvalidation',
                 'Value': item.failure_description if item.failure_description else None,
                 'Type': 2,
                 'Id': cls.failure_description_attribute_id
@@ -713,7 +713,6 @@ class PartSerializer(Serializer):
             code = code.strip()
             code = code[1:] if len(code) == 11 else code
         type_repair_id = cls._get_value_from_xml(element, 'ВидРемонта')
-        name_repair = cls._get_value_from_xml(element, 'ВидРемонтаНаименование')
 
         entity = entities.Part(
             toir_id=toir_id,
@@ -723,7 +722,6 @@ class PartSerializer(Serializer):
             code=code,
             type_repair=entities.ReferenceAttribute(toir_id=type_repair_id, name='ВидРемонта',
                                                     attribute_id=cls.type_repair_attribute_id),
-            name_repair=name_repair,
         )
         return entity
 
@@ -738,7 +736,6 @@ class PartSerializer(Serializer):
         unit = cls._get_value(attributes, cls.unit_attribute_id)
         amount = cls._get_value(attributes, cls.amount_attribute_id)
         code = cls._get_value(attributes, cls.code_attribute_id)
-        name_repair = cls._get_value(attributes, cls.name_repair_attribute_id)
         type_repair_id = cls._get_value(attributes, cls.type_repair_attribute_id, get_only_id=True)
         type_repair_name = cls._get_value(attributes, cls.type_repair_attribute_id)
 
@@ -752,7 +749,6 @@ class PartSerializer(Serializer):
             code=code,
             type_repair=entities.ReferenceAttribute(reference_name=type_repair_name, reference_id=type_repair_id,
                                                     attribute_id=cls.type_repair_attribute_id),
-            name_repair=name_repair,
         )
         return entity
 
@@ -775,12 +771,6 @@ class PartSerializer(Serializer):
         put_request_body = [
             {
                 'Name': 'forvalidation',
-                'Value': item.toir_id if item.toir_id else None,
-                'Type': 2,
-                'Id': cls.toir_id_attribute_id
-            },
-            {
-                'Name': 'forvalidation',
                 'Value': item.name if item.name else None,
                 'Type': 2,
                 'Id': cls.part_name_attribute_id
@@ -788,7 +778,7 @@ class PartSerializer(Serializer):
             {
                 'Name': 'forvalidation',
                 'Value': item.unit if item.unit else None,
-                'Type': 8,
+                'Type': 2,
                 'Id': cls.unit_attribute_id
             },
             {
@@ -796,18 +786,6 @@ class PartSerializer(Serializer):
                 'Value': item.code if item.code else None,
                 'Type': 2,
                 'Id': cls.code_attribute_id
-            },
-            {
-                'Name': 'forvalidation',
-                'Value': item.code if item.code else None,
-                'Type': 2,
-                'Id': cls.code_attribute_id
-            },
-            {
-                'Name': 'forvalidation',
-                'Value': item.name_repair if item.name_repair else None,
-                'Type': 2,
-                'Id': cls.name_repair_attribute_id
             },
             {
                 'Name': 'forvalidation',
@@ -967,12 +945,6 @@ class FactRepairSerializer(Serializer):
         put_request_body = [
             {
                 'Name': 'forvalidation',
-                'Value': item.toir_id if item.toir_id else None,
-                'Type': 2,
-                'Id': cls.toir_id_attribute_id
-            },
-            {
-                'Name': 'forvalidation',
                 'Value': item.fact_start_date if item.fact_start_date else None,
                 'Type': 3,
                 'Id': cls.repair_start_date_attribute_id
@@ -993,7 +965,7 @@ class FactRepairSerializer(Serializer):
                 'Name': 'forvalidation',
                 'Value': item.repair_id if item.repair_id else None,
                 'Type': 2,
-                'Id': cls.operating_attribute_id
+                'Id': cls.repair_id_attribute_id
             },
             {
                 'Name': 'forvalidation',
@@ -1094,12 +1066,6 @@ class PlanRepairSerializer(Serializer):
         put_request_body = [
             {
                 'Name': 'forvalidation',
-                'Value': item.toir_id if item.toir_id else None,
-                'Type': 2,
-                'Id': cls.toir_id_attribute_id
-            },
-            {
-                'Name': 'forvalidation',
                 'Value': item.start_date if item.start_date else None,
                 'Type': 3,
                 'Id': cls.repair_start_date_attribute_id
@@ -1114,7 +1080,7 @@ class PlanRepairSerializer(Serializer):
                 'Name': 'forvalidation',
                 'Value': item.type_repair.request_value,
                 'Type': 8,
-                'Id': cls.departament_id_attribute_id
+                'Id': cls.type_repair_attribute_id
             },
             {
                 'Name': 'forvalidation',
