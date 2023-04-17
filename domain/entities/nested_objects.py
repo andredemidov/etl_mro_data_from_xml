@@ -20,7 +20,6 @@ class Failure:
 
     def to_compare_dict(self) -> dict:
         return {
-            'toir_id': self.toir_id,
             'toir_url': self.toir_url,
             'type_failure_id': self.type_failure.comparison_value,
             'type_reason_failure_id': self.type_reason_failure.comparison_value,
@@ -41,20 +40,18 @@ class Part:
     amount: float
     code: str
     type_repair: reference_attribute.ReferenceAttribute
-    name_repair: str
+    name_repair: str = None
     self_id: str = None
     host_id: str = None
     update_status: STATUS = 'empty'
 
     def to_compare_dict(self) -> dict:
         return {
-            'toir_id': self.toir_id,
             'name': self.name,
             'unit': self.unit,
             'amount': round(self.amount, 4),
             'code': self.code,
             'type_repair_id': self.type_repair.comparison_value,
-            'name_repair': self.name_repair,
         }
 
     @property
@@ -73,7 +70,6 @@ class Property:
 
     def to_compare_dict(self) -> dict:
         return {
-            'toir_id': self.toir_id,
             'property': self.toir_property.comparison_value,
             'value': self.value,
         }
@@ -97,7 +93,6 @@ class PlanRepair:
 
     def to_compare_dict(self) -> dict:
         return {
-            'toir_id': self.toir_id,
             'repair_id': self.repair_id,
             'type_repair_id': self.type_repair.comparison_value,
             'toir_url': self.toir_url,
@@ -125,7 +120,6 @@ class FactRepair:
 
     def to_compare_dict(self) -> dict:
         return {
-            'toir_id': self.toir_id,
             'repair_id': self.repair_id,
             'type_repair_id': self.type_repair.comparison_value,
             'toir_url': self.toir_url,
@@ -152,7 +146,6 @@ class Movement:
 
     def to_compare_dict(self) -> dict:
         return {
-            'toir_id': self.toir_id,
             'previous_toir_id': self.previous_toir_id,
             'previous_name': self.previous_name,
             'movement_reason': self.movement_reason,
