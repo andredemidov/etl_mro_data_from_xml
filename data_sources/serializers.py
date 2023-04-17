@@ -704,6 +704,10 @@ class PartSerializer(Serializer):
         name = cls._get_value_from_xml(element, 'НоменклатураНаименование')
         unit = cls._get_value_from_xml(element, 'ЕдиницаИзмеренияНаименование')
         amount = cls._get_value_from_xml(element, 'Количество')
+        if amount:
+            amount = int(amount)
+        else:
+            amount = 0
         code = cls._get_value_from_xml(element, 'Код1СБухгалтерия')
         if code:
             # In file there are two options:
@@ -734,7 +738,7 @@ class PartSerializer(Serializer):
         toir_id = cls._get_value(attributes, cls.toir_id_attribute_id)
         name = cls._get_value(attributes, cls.part_name_attribute_id)
         unit = cls._get_value(attributes, cls.unit_attribute_id)
-        amount = cls._get_value(attributes, cls.amount_attribute_id)
+        amount = cls._get_value(attributes, cls.amount_attribute_id, attribute_type='int')
         code = cls._get_value(attributes, cls.code_attribute_id)
         type_repair_id = cls._get_value(attributes, cls.type_repair_attribute_id, get_only_id=True)
         type_repair_name = cls._get_value(attributes, cls.type_repair_attribute_id)
@@ -780,6 +784,12 @@ class PartSerializer(Serializer):
                 'Value': item.unit if item.unit else None,
                 'Type': 2,
                 'Id': cls.unit_attribute_id
+            },
+            {
+                'Name': 'forvalidation',
+                'Value': item.amount if item.amount else None,
+                'Type': 1,
+                'Id': cls.amount_attribute_id
             },
             {
                 'Name': 'forvalidation',
