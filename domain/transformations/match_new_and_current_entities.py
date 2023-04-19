@@ -21,7 +21,8 @@ class MatchNewAndCurrentEntities:
         # if the current one still has status 'empty' it means that there is no match with
         # any new one, and it has to be deleted
         # add such an entities to the new entities repository
-        entities_for_delete = list(filter(lambda x: x.update_status == 'empty', self._current_entities_repository.get()))
+        entities_for_delete = list(filter(lambda x: x.update_status == 'empty',
+                                          self._current_entities_repository.get()))
         self._new_entities_repository.add(entities_for_delete)
 
     @classmethod
@@ -49,36 +50,36 @@ class MatchNewAndCurrentEntities:
             new_entity.update_status = 'new'
 
         # nested objects
-        cls._check_update_status_for_nested_objects(new_entity, current_entity)
-
-    @staticmethod
-    def _check_update_status_for_nested_objects(new_entity, current_entity):
-        if current_entity:
-            for i in range(len(new_entity.get_nested_objects())):
-                current = current_entity.get_nested_objects()[i]
-                current_dict = {nested_object.unique_id: nested_object for nested_object in current}
-                nested_objects_in_new = new_entity.get_nested_objects()[i]
-                for new_object in nested_objects_in_new:
-                    current_object = current_dict.get(new_object.unique_id)
-                    if current_object:
-                        new_object.self_id = current_object.self_id
-                        new_object.host_id = current_object.host_id
-                        # update status
-                        if new_object.to_compare_dict() != current_object.to_compare_dict():
-                            new_object.update_status = 'updated'
-                            current_object.update_status = 'updated'
-                        else:
-                            new_object.update_status = 'not updated'
-                            current_object.update_status = 'not updated'
-                    else:
-                        new_object.update_status = 'new'
-
-                # if the current one still has status 'empty' it means that there is no match with
-                # any new one, and it has to be deleted
-                # add such an entities to the nested objects list with status 'empty'
-                nested_for_delete = list(filter(lambda x: x.update_status == 'empty', current))
-                nested_objects_in_new.extend(nested_for_delete)
+        if current_entity and new_entity.get_nested_objects():
+            cls._check_update_status_for_nested_objects(new_entity, current_entity)
         else:
             for i in range(len(new_entity.get_nested_objects())):
                 for new_object in new_entity.get_nested_objects()[i]:
                     new_object.update_status = 'new'
+
+    @staticmethod
+    def _check_update_status_for_nested_objects(new_entity, current_entity):
+        for i in range(len(new_entity.get_nested_objects())):
+            current = current_entity.get_nested_objects()[i]
+            current_dict = {nested_object.unique_id: nested_object for nested_object in current}
+            nested_objects_in_new = new_entity.get_nested_objects()[i]
+            for new_object in nested_objects_in_new:
+                current_object = current_dict.get(new_object.unique_id)
+                if current_object:
+                    new_object.self_id = current_object.self_id
+                    new_object.host_id = current_object.host_id
+                    # update status
+                    if new_object.to_compare_dict() != current_object.to_compare_dict():
+                        new_object.update_status = 'updated'
+                        current_object.update_status = 'updated'
+                    else:
+                        new_object.update_status = 'not updated'
+                        current_object.update_status = 'not updated'
+                else:
+                    new_object.update_status = 'new'
+
+            # if the current one still has status 'empty' it means that there is no match with
+            # any new one, and it has to be deleted
+            # add such an entities to the nested objects list with status 'empty'
+            nested_for_delete = list(filter(lambda x: x.update_status == 'empty', current))
+            nested_objects_in_new.extend(nested_for_delete)

@@ -36,7 +36,7 @@ class Serializer:
     # collection attributes
     failure_collection_attribute_id = '909f260f-6333-e811-810f-edf0bf5e0091'
     part_collection_attribute_id = '86faae6e-5747-ec11-9117-005056b6948b'
-    property_collection_attribute_id = '=170c062a-5c49-e811-810f-edf0bf5e0091'
+    property_collection_attribute_id = '170c062a-5c49-e811-810f-edf0bf5e0091'
     fact_repair_collection_attribute_id = '3b42cbc3-bd5d-e811-810f-edf0bf5e0091'
     plan_repair_collection_attribute_id = 'e56f151e-7641-e811-810f-edf0bf5e0091'
 
@@ -107,17 +107,43 @@ class Serializer:
         }
     }
     dimension_files = {
-        'ВидРемонта': {'file': 'ТаблицаВидыРемонтов', 'toir_id': 'ВидРемонта', 'value': 'ВидРемонта_Наименование'},
+        'ВидРемонта': {
+            'file': 'ТаблицаВидыРемонтов',
+            'toir_id': 'ВидРемонта',
+            'value': 'ВидРемонта_Наименование',
+            'parent': 'ВидРемонта_Родитель',
+        },
         # '':'ТаблицаПараметровНаработки',
-        'ВидОтказа': {'file': 'ТаблицаВидыОтказа', 'toir_id': 'ВидОтказа', 'value': 'ВидОтказа_Наименование'},
-        'ПодразделениеВладелец': {'file': 'ТаблицаПодразделений', 'toir_id': 'МВЗ', 'value': 'МВЗ_Наименование'},
-        'ПричинаОтказа': {'file': 'ТаблицаПричиныОтказа',
-                          'toir_id': 'ПричинаОтказа',
-                          'value': 'ПричинаОтказа_Наименование'},
-        'ТиповойОР': {'file': 'ТаблицаТОР', 'toir_id': 'ТиповойОР', 'value': 'ТиповойОР_Наименование'},
-        'Характеристика': {'file': 'ТаблицаХарактеристики',
-                           'toir_id': 'Характеристика',
-                           'value': 'Характеристика_Наименование'},
+        'ВидОтказа': {
+            'file': 'ТаблицаВидыОтказа',
+            'toir_id': 'ВидОтказа',
+            'value': 'ВидОтказа_Наименование',
+            'parent': 'ВидОтказа_Родитель',
+        },
+        'ПодразделениеВладелец': {
+            'file': 'ТаблицаПодразделений',
+            'toir_id': 'МВЗ',
+            'value': 'МВЗ_Наименование',
+            'parent': 'МВЗ_Родитель',
+        },
+        'ПричинаОтказа': {
+            'file': 'ТаблицаПричиныОтказа',
+            'toir_id': 'ПричинаОтказа',
+            'value': 'ПричинаОтказа_Наименование',
+            'parent': 'ПричинаОтказа_Родитель',
+        },
+        'ТиповойОР': {
+            'file': 'ТаблицаТОР',
+            'toir_id': 'ТиповойОР',
+            'value': 'ТиповойОР_Наименование',
+            'parent': 'ТиповойОР_Родитель',
+        },
+        'Характеристика': {
+            'file': 'ТаблицаХарактеристики',
+            'toir_id': 'Характеристика',
+            'value': 'Характеристика_Наименование',
+            'parent': '',
+        },
     }
 
     @staticmethod
@@ -128,23 +154,29 @@ class Serializer:
             if item_type == 8 and get_only_id:
                 return attributes[attribute_id]['Value']['Id']
             elif item_type == 8:
-                return attributes[attribute_id]['Value']['Name']
+                value = attributes[attribute_id]['Value']['Name']
+                return value.strip() if value else value
             # elif item_type == 3:
             #     value = attributes[attribute_id]['Value']
             #     return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S')
             elif item_type == 1:
                 return round(attributes[attribute_id]['Value'], 4)
             else:
-                return attributes[attribute_id]['Value']
+                value = attributes[attribute_id]['Value']
+                return value.strip() if value else value
         else:
-            if attribute_type == 'int':
+            if attribute_type == 'num':
                 return 0
             else:
                 return None
 
     @staticmethod
     def _get_value_from_xml(element, tag):
-        return element.find(tag).text if element.find(tag) is not None else None
+        value = element.find(tag).text if element.find(tag) is not None else None
+        if value and value.strip():
+            return value.strip()
+        else:
+            return None
 
 
 class OperationObjectSerializer(Serializer):
@@ -170,12 +202,12 @@ class ObjectRepairGroupSerializer(Serializer):
 
     @classmethod
     def init_from_xml(cls, element) -> entities.ObjectRepairGroup:
-        toir_id = element.find('РеквизитыОР/ОбъектРемонта').text
-        level = int(element.find('РеквизитыОР/УровеньГруппы').text)
-        parent = element.find('РеквизитыОР/ОбъектРемонта_Родитель').text
-        name = element.find('РеквизитыОР/ОбъектРемонтаНаименование').text
-        toir_url = element.find('РеквизитыОР/СсылкаОР').text
-        departament_id = element.find('РеквизитыОР/ПодразделениеВладелец').text
+        toir_id = cls._get_value_from_xml(element, 'РеквизитыОР/ОбъектРемонта')
+        level = int(cls._get_value_from_xml(element, 'РеквизитыОР/УровеньГруппы'))
+        parent = cls._get_value_from_xml(element, 'РеквизитыОР/ОбъектРемонта_Родитель')
+        name = cls._get_value_from_xml(element, 'РеквизитыОР/ОбъектРемонтаНаименование')
+        toir_url = cls._get_value_from_xml(element, 'РеквизитыОР/СсылкаОР')
+        departament_id = cls._get_value_from_xml(element, 'РеквизитыОР/ПодразделениеВладелец')
 
         repair_object = entities.ObjectRepairGroup(
             toir_id=toir_id,
@@ -194,7 +226,7 @@ class ObjectRepairGroupSerializer(Serializer):
         self_id = item['Object']['Id']
 
         toir_id = cls._get_value(attributes, cls.toir_id_attribute_id)
-        level = int(cls._get_value(attributes, cls.level_attribute_id, attribute_type='int'))
+        level = int(cls._get_value(attributes, cls.level_attribute_id, attribute_type='num'))
         parent = cls._get_value(attributes, cls.parent_attribute_id)
         name = cls._get_value(attributes, cls.name_attribute_id)
         toir_url = cls._get_value(attributes, cls.toir_url_attribute_id)
@@ -280,13 +312,13 @@ class TechPositionSerializer(Serializer):
 
     @classmethod
     def init_from_xml(cls, element) -> entities.TechPosition:
-        toir_id = element.find('РеквизитыОР/ОбъектРемонта').text
-        level = int(element.find('РеквизитыОР/УровеньГруппы').text)
-        parent = element.find('РеквизитыОР/ОбъектРемонта_Родитель').text
-        name = element.find('РеквизитыОР/ОбъектРемонтаНаименование').text
-        tech_number = element.find('РеквизитыОР/ТехНомер').text
-        toir_url = element.find('РеквизитыОР/СсылкаОР').text
-        departament_id = element.find('РеквизитыОР/ПодразделениеВладелец').text
+        toir_id = cls._get_value_from_xml(element, 'РеквизитыОР/ОбъектРемонта')
+        level = int(cls._get_value_from_xml(element, 'РеквизитыОР/УровеньГруппы'))
+        parent = cls._get_value_from_xml(element, 'РеквизитыОР/ОбъектРемонта_Родитель')
+        name = cls._get_value_from_xml(element, 'РеквизитыОР/ОбъектРемонтаНаименование')
+        tech_number = cls._get_value_from_xml(element, 'РеквизитыОР/ТехНомер')
+        toir_url = cls._get_value_from_xml(element, 'РеквизитыОР/СсылкаОР')
+        departament_id = cls._get_value_from_xml(element, 'РеквизитыОР/ПодразделениеВладелец')
 
         repair_object = entities.TechPosition(
             toir_id=toir_id,
@@ -306,7 +338,7 @@ class TechPositionSerializer(Serializer):
         self_id = item['Object']['Id']
 
         toir_id = cls._get_value(attributes, cls.toir_id_attribute_id)
-        level = int(cls._get_value(attributes, cls.level_attribute_id, attribute_type='int'))
+        level = int(cls._get_value(attributes, cls.level_attribute_id, attribute_type='num'))
         parent = cls._get_value(attributes, cls.parent_attribute_id)
         name = cls._get_value(attributes, cls.name_attribute_id)
         tech_number = cls._get_value(attributes, cls.tech_number_attribute_id)
@@ -400,20 +432,20 @@ class EquipmentSerializer(Serializer):
 
     @classmethod
     def init_from_xml(cls, element) -> entities.Equipment:
-        toir_id = element.find('РеквизитыОР/ОбъектРемонта').text
-        level = int(element.find('РеквизитыОР/УровеньГруппы').text)
-        parent = element.find('РеквизитыОР/ОбъектРемонта_Родитель').text
-        name = element.find('РеквизитыОР/ОбъектРемонтаНаименование').text
-        tech_number = element.find('РеквизитыОР/ТехНомер').text
-        toir_url = element.find('РеквизитыОР/СсылкаОР').text
-        registration_number = element.find('РеквизитыОР/РегистрационныйНомер').text
-        commodity_producer = element.find('РеквизитыОР/Изготовитель').text
-        commodity_number = element.find('РеквизитыОР/ЗаводскойНомер').text
-        category = element.find('РеквизитыОР/КатегорияОборудования').text
-        operation_date = element.find('РеквизитыОР/ДатаВводаВЭксплуатацию').text
-        departament_id = element.find('РеквизитыОР/ПодразделениеВладелец').text
-        typical_object = element.find('РеквизитыОР/ТиповойОР').text
-        operating = element.find('Наработка/Значение').text
+        toir_id = cls._get_value_from_xml(element, 'РеквизитыОР/ОбъектРемонта')
+        level = int(cls._get_value_from_xml(element, 'РеквизитыОР/УровеньГруппы'))
+        parent = cls._get_value_from_xml(element, 'РеквизитыОР/ОбъектРемонта_Родитель')
+        name = cls._get_value_from_xml(element, 'РеквизитыОР/ОбъектРемонтаНаименование')
+        tech_number = cls._get_value_from_xml(element, 'РеквизитыОР/ТехНомер')
+        toir_url = cls._get_value_from_xml(element, 'РеквизитыОР/СсылкаОР')
+        registration_number = cls._get_value_from_xml(element, 'РеквизитыОР/РегистрационныйНомер')
+        commodity_producer = cls._get_value_from_xml(element, 'РеквизитыОР/Изготовитель')
+        commodity_number = cls._get_value_from_xml(element, 'РеквизитыОР/ЗаводскойНомер')
+        category = cls._get_value_from_xml(element, 'РеквизитыОР/КатегорияОборудования')
+        operation_date = cls._get_value_from_xml(element, 'РеквизитыОР/ДатаВводаВЭксплуатацию')
+        departament_id = cls._get_value_from_xml(element, 'РеквизитыОР/ПодразделениеВладелец')
+        typical_object = cls._get_value_from_xml(element, 'РеквизитыОР/ТиповойОР')
+        operating = cls._get_value_from_xml(element, 'Наработка/Значение')
 
         if operation_date:
             operation_date = datetime.strptime(operation_date, '%Y-%m-%dT%H:%M:%S')
@@ -445,7 +477,7 @@ class EquipmentSerializer(Serializer):
         self_id = item['Object']['Id']
 
         toir_id = cls._get_value(attributes, cls.toir_id_attribute_id)
-        level = int(cls._get_value(attributes, cls.level_attribute_id, attribute_type='int'))
+        level = int(cls._get_value(attributes, cls.level_attribute_id, attribute_type='num'))
         parent = cls._get_value(attributes, cls.parent_attribute_id)
         name = cls._get_value(attributes, cls.name_attribute_id)
         tech_number = cls._get_value(attributes, cls.tech_number_attribute_id)
@@ -597,7 +629,6 @@ class FailureSerializer(Serializer):
         type_failure_id = cls._get_value_from_xml(element, 'ВидОтказа')
         type_reason_failure_id = cls._get_value_from_xml(element, 'ПричинаОтказа')
         toir_url = cls._get_value_from_xml(element, 'СсылкаРеестрОтказов')
-        # TODO: string date like 2020-01-14T23:10:00 to datetime
         failure_date = cls._get_value_from_xml(element, 'ДатаОтказа')
         failure_description = cls._get_value_from_xml(element, 'Симптомы')
 
@@ -671,7 +702,7 @@ class FailureSerializer(Serializer):
             {
                 'Name': 'forvalidation',
                 'Value': item.failure_date if item.failure_date else None,
-                'Type': 5,
+                'Type': 3,
                 'Id': cls.failure_date_attribute_id
             },
             {
@@ -705,7 +736,7 @@ class PartSerializer(Serializer):
         unit = cls._get_value_from_xml(element, 'ЕдиницаИзмеренияНаименование')
         amount = cls._get_value_from_xml(element, 'Количество')
         if amount:
-            amount = int(amount)
+            amount = float(amount)
         else:
             amount = 0
         code = cls._get_value_from_xml(element, 'Код1СБухгалтерия')
@@ -738,7 +769,7 @@ class PartSerializer(Serializer):
         toir_id = cls._get_value(attributes, cls.toir_id_attribute_id)
         name = cls._get_value(attributes, cls.part_name_attribute_id)
         unit = cls._get_value(attributes, cls.unit_attribute_id)
-        amount = cls._get_value(attributes, cls.amount_attribute_id, attribute_type='int')
+        amount = cls._get_value(attributes, cls.amount_attribute_id, attribute_type='num')
         code = cls._get_value(attributes, cls.code_attribute_id)
         type_repair_id = cls._get_value(attributes, cls.type_repair_attribute_id, get_only_id=True)
         type_repair_name = cls._get_value(attributes, cls.type_repair_attribute_id)
@@ -811,7 +842,8 @@ class PropertySerializer(Serializer):
 
     @classmethod
     def init_from_xml(cls, element) -> entities.Property:
-        toir_id = cls._get_value_from_xml(element, 'ОР')
+        # within Property toir id is property's toir id
+        toir_id = cls._get_value_from_xml(element, 'Характеристика')
         property_id = cls._get_value_from_xml(element, 'Характеристика')
         value = cls._get_value_from_xml(element, 'Значение')
 
@@ -914,7 +946,7 @@ class FactRepairSerializer(Serializer):
         host_id = item['Object']['HostObjectId']
 
         toir_id = cls._get_value(attributes, cls.toir_id_attribute_id)
-        repair_id = cls._get_value(attributes, cls.repair_id_attribute_id, get_only_id=True)
+        repair_id = cls._get_value(attributes, cls.repair_id_attribute_id)
         toir_url = cls._get_value(attributes, cls.act_url_attribute_id)
         fact_start_date = cls._get_value(attributes, cls.repair_start_date_attribute_id)
         fact_finish_date = cls._get_value(attributes, cls.repair_finish_date_attribute_id)
@@ -1027,7 +1059,7 @@ class PlanRepairSerializer(Serializer):
         host_id = item['Object']['HostObjectId']
 
         toir_id = cls._get_value(attributes, cls.toir_id_attribute_id)
-        repair_id = cls._get_value(attributes, cls.repair_id_attribute_id, get_only_id=True)
+        repair_id = cls._get_value(attributes, cls.repair_id_attribute_id)
         toir_url = cls._get_value(attributes, cls.plan_url_attribute_id)
         start_date = cls._get_value(attributes, cls.repair_start_date_attribute_id)
         finish_date = cls._get_value(attributes, cls.repair_finish_date_attribute_id)
@@ -1097,6 +1129,12 @@ class PlanRepairSerializer(Serializer):
                 'Value': item.toir_url,
                 'Type': 6,
                 'Id': cls.plan_url_attribute_id
+            },
+            {
+                'Name': 'forvalidation',
+                'Value': item.repair_id,
+                'Type': 2,
+                'Id': cls.repair_id_attribute_id
             },
         ]
         return put_request_body

@@ -128,6 +128,8 @@ class NewObjectsRepository(Repository):
             for nested_items in host_item.get_nested_objects():
                 nested_items_for_delete = list(filter(lambda x: x.update_status == 'empty', nested_items))
                 for item in nested_items_for_delete:
+                    # before any action set host_id from host_item
+                    item.host_id = host_item.self_id
                     status = self._post_data_adapter.delete_nested_object(item)
                     statistic[status] += 1
         return statistic

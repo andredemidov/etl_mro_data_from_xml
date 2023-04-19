@@ -23,7 +23,7 @@ class Failure:
             'toir_url': self.toir_url,
             'type_failure_id': self.type_failure.comparison_value,
             'type_reason_failure_id': self.type_reason_failure.comparison_value,
-            'failure_date': self.failure_date,
+            'failure_date': self.failure_date[:10] if self.failure_date else self.failure_date,
             'failure_description': self.failure_description,
         }
 
@@ -56,7 +56,9 @@ class Part:
 
     @property
     def unique_id(self):
-        return self.code
+        cons = [self.code, self.type_repair.comparison_value]
+        result = [one for one in cons if one]
+        return ' '.join(result)
 
 
 @dataclass
@@ -70,13 +72,15 @@ class Property:
 
     def to_compare_dict(self) -> dict:
         return {
+            'property_toir_id': self.toir_id,
             'property': self.toir_property.comparison_value,
             'value': self.value,
         }
 
     @property
     def unique_id(self):
-        return self.toir_property.comparison_value
+        # toir_id here is property's toir id
+        return self.toir_id
 
 
 @dataclass
@@ -85,8 +89,8 @@ class PlanRepair:
     repair_id: str
     type_repair: reference_attribute.ReferenceAttribute
     toir_url: str
-    start_date: datetime
-    finish_date: datetime
+    start_date: str
+    finish_date: str
     self_id: str = None
     host_id: str = None
     update_status: STATUS = 'empty'
@@ -96,13 +100,15 @@ class PlanRepair:
             'repair_id': self.repair_id,
             'type_repair_id': self.type_repair.comparison_value,
             'toir_url': self.toir_url,
-            'start_date': self.start_date,
-            'finish_date': self.finish_date,
+            'start_date': self.start_date[:10] if self.start_date else self.start_date,
+            'finish_date': self.finish_date[:10] if self.finish_date else self.finish_date,
         }
 
     @property
     def unique_id(self):
-        return self.repair_id
+        cons = [self.repair_id, self.toir_url]
+        result = [one for one in cons if one]
+        return ' '.join(result)
 
 
 @dataclass
@@ -111,8 +117,8 @@ class FactRepair:
     repair_id: str
     type_repair: reference_attribute.ReferenceAttribute
     toir_url: str
-    fact_start_date: datetime
-    fact_finish_date: datetime
+    fact_start_date: str
+    fact_finish_date: str
     operating: float
     self_id: str = None
     host_id: str = None
@@ -123,14 +129,16 @@ class FactRepair:
             'repair_id': self.repair_id,
             'type_repair_id': self.type_repair.comparison_value,
             'toir_url': self.toir_url,
-            'fact_start_date': self.fact_start_date,
-            'fact_finish_date': self.fact_finish_date,
+            'fact_start_date': self.fact_start_date[:10] if self.fact_start_date else self.fact_start_date,
+            'fact_finish_date': self.fact_finish_date[:10] if self.fact_finish_date else self.fact_finish_date,
             'operating': self.operating,
         }
 
     @property
     def unique_id(self):
-        return self.repair_id
+        cons = [self.repair_id, self.toir_url]
+        result = [one for one in cons if one]
+        return ' '.join(result)
 
 
 @dataclass
