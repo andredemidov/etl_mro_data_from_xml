@@ -17,7 +17,7 @@ def log_statistic(statistic: dict):
 
 
 def integrate_operation_object(operation_object, get_new_data_adapter, get_current_data_adapter, post_data_adapter):
-    # new data
+    # создние репозитория для новых данных из файла
     new_repository = repositories.NewObjectsRepository(
         operation_object=operation_object,
         get_new_data_adapter=get_new_data_adapter,

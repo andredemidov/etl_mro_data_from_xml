@@ -2,7 +2,10 @@ from domain import entities
 
 
 class Repository:
-
+    """
+    Абстрактный класс для всех репозиториев. Реализовано ленивое получение данных - в момент инициации репозитория
+    данные не запрашиваются, а запрашиваются только при первом вызове метода get
+    """
     def __init__(self, entries: list = None):
         self._entries = []
         if entries:
@@ -12,11 +15,23 @@ class Repository:
         pass
 
     def get(self) -> list:
+        """
+        Метод для получения данных из репозитория. При первом вызове извлекает данные из источника. Возвращает копию
+        списка объектов в репозитории. Это сделано для того, чтобы исключить случайную фильтрацию, удаление, сортировку
+        объектов оригинально списка объектов в репозитории. При этом остается возможность редактирования
+         самих объектов (удобство ООП)
+        :return: копию списка объектов в репозитории
+        """
         if not self._entries:
             self._get_data_from_source()
         return self._entries.copy()
 
     def add(self, entries: list):
+        """
+        Метод для добавления новых объектов в репозиторий. Проверка, что в переданном списке именно объекты нужного
+        класса не проводится.
+        :param entries: список объектов
+        """
         self._entries.extend(entries)
 
 
@@ -28,7 +43,12 @@ class CurrentObjectsRepository(Repository):
         super().__init__()
 
     def _get_data_from_source(self):
+        # Список типов объектов, которые будут извлекаться с помощью адаптера
         objects = ['object_repair_group', 'tech_position', 'equipment']
+        # Здесь репозиторий взаимодействует с адаптером для получения соответствующих данных
+        # метод реализует интерфейс, в соответствии с которым адаптер должен иметь метод retrieve, принимающий два
+        # аргумента: объект OperationObject и строку с типом объекта.
+        # Репозиторий содержит одновременно сущности трех классов
         for object_type in objects:
             items = self._get_current_data_adapter.retrieve(self._operation_object, object_type)
             self.add(items)
@@ -41,6 +61,7 @@ class CurrentObjectsRepository(Repository):
             {'nested_object': 'failure', 'attribute_name': 'failures'},
             {'nested_object': 'part', 'attribute_name': 'parts'},
         ]
+        # Аналогично и по вложенным объектам. Адаптер должен соответствовать интерфейсу
         for nested_object in nested_objects:
             self._get_current_data_adapter.join_nested_objects_to_entities(
                 operation_object=self._operation_object,
@@ -57,6 +78,9 @@ class OperationObjectsRepository(Repository):
         super().__init__()
 
     def _get_data_from_source(self):
+        # Здесь репозиторий взаимодействует с адаптером для получения соответствующих данных
+        # метод реализует интерфейс, в соответствии с которым адаптер должен иметь метод retrieve, принимающий два
+        # аргумента: объект OperationObject (в данном случае None) и строку с типом объекта.
         items = self._get_current_data_adapter.retrieve(None, 'operation_object')
         self.add(items)
 
@@ -70,6 +94,7 @@ class NewObjectsRepository(Repository):
         super().__init__()
 
     def _get_data_from_source(self):
+        # Здесь репозиторий взаимодействует с адаптером для получения соответствующих данных
         object_repair_groups = self._get_new_data_adapter.get_new_object_repair_group(self._operation_object)
         self.add(object_repair_groups)
         equipment = self._get_new_data_adapter.get_new_equipment(self._operation_object)
@@ -78,6 +103,11 @@ class NewObjectsRepository(Repository):
         self.add(tech_position)
 
     def save(self) -> dict:
+        """
+        Метод для сохранения (записи) данных. Включает в себя операции по созданию и обновлению. Соответствующее
+        действие для конкретной сущности выбирается исходя из статуса - update_status.
+        :return: возвращает dict со статистикой ошибок и успешных сохранений типа: {'success': 0, 'error': 0}
+        """
         statistic = {'success': 0, 'error': 0}
         actions = {
             'updated': self._post_data_adapter.update,
@@ -95,6 +125,11 @@ class NewObjectsRepository(Repository):
         return statistic
 
     def save_nested_objects(self) -> dict:
+        """
+        Метод для сохранения (записи) данных по вложенным объектам. Включает в себя операции по созданию и обновлению.
+        Соответствующее действие для конкретной сущности выбирается исходя из статуса - update_status.
+        :return: возвращает dict со статистикой ошибок и успешных сохранений типа: {'success': 0, 'error': 0}
+        """
         statistic = {'success': 0, 'error': 0}
         actions = {
             'updated': self._post_data_adapter.update_nested_object,
@@ -114,7 +149,12 @@ class NewObjectsRepository(Repository):
         return statistic
 
     def delete(self):
+        """
+        Метод для удаления объекта.
+        :return: возвращает dict со статистикой ошибок и успешных сохранений типа: {'success': 0, 'error': 0}
+        """
         statistic = {'success': 0, 'error': 0}
+        # статус обновления empty означает, что сущность подлежит удалению
         entities_for_delete = list(filter(lambda x: x.update_status == 'empty', self.get()))
         for entity in entities_for_delete:
             status = self._post_data_adapter.delete(entity)
@@ -122,7 +162,12 @@ class NewObjectsRepository(Repository):
         return statistic
 
     def delete_nested_objects(self):
+        """
+        Метод для удаления вложенного объекта.
+        :return: возвращает dict со статистикой ошибок и успешных сохранений типа: {'success': 0, 'error': 0}
+        """
         statistic = {'success': 0, 'error': 0}
+        # статус обновления empty означает, что сущность подлежит удалению
         host_items = list(filter(lambda x: x.update_status != 'empty', self.get()))
         for host_item in host_items:
             for nested_items in host_item.get_nested_objects():
