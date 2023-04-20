@@ -14,6 +14,7 @@ class Equipment:
     parent_toir_id: str
     name: str
     operating: float
+    object_type: str
     departament: reference_attribute.ReferenceAttribute
     typical_object: reference_attribute.ReferenceAttribute
     toir_url: str
@@ -40,6 +41,14 @@ class Equipment:
     def __str__(self):
         return f'{self.name}, {self.toir_id}'
 
+    @property
+    def unique_id(self):
+        return self.toir_id
+
+    @property
+    def parent_id(self):
+        return self.parent_object.self_id if self.parent_object else None
+
     def get_nested_objects(self):
         return [
             self.properties,
@@ -48,6 +57,17 @@ class Equipment:
             self.failures,
             self.parts,
         ]
+
+    @property
+    def nested_objects_map(self):
+        nested_objects = [
+            {'nested_object': 'property', 'attribute_name': 'properties'},
+            {'nested_object': 'plan_repair', 'attribute_name': 'plan_repairs'},
+            {'nested_object': 'fact_repair', 'attribute_name': 'fact_repairs'},
+            {'nested_object': 'failure', 'attribute_name': 'failures'},
+            {'nested_object': 'part', 'attribute_name': 'parts'},
+        ]
+        return nested_objects
 
     def to_compare_dict(self) -> dict:
         return {
@@ -104,4 +124,5 @@ class Equipment:
             self_id=data.get('self_id'),
             category=data.get('category'),
             replaced=data.get('replaced'),
+            object_type='equipment',
         )

@@ -10,6 +10,7 @@ STATUS = Literal['updated', 'new', 'empty', 'not updated']
 class Failure:
     toir_id: str
     toir_url: str
+    object_type: str
     type_failure: reference_attribute.ReferenceAttribute
     type_reason_failure: reference_attribute.ReferenceAttribute
     failure_date: datetime
@@ -31,6 +32,10 @@ class Failure:
     def unique_id(self):
         return self.toir_url
 
+    @property
+    def parent_id(self):
+        return self.host_id
+
 
 @dataclass
 class Part:
@@ -39,6 +44,7 @@ class Part:
     unit: str
     amount: float
     code: str
+    object_type: str
     type_repair: reference_attribute.ReferenceAttribute
     name_repair: str = None
     self_id: str = None
@@ -60,12 +66,17 @@ class Part:
         result = [one for one in cons if one]
         return ' '.join(result)
 
+    @property
+    def parent_id(self):
+        return self.host_id
+
 
 @dataclass
 class Property:
     toir_id: str
     toir_property: reference_attribute.ReferenceAttribute
     value: str
+    object_type: str
     self_id: str = None
     host_id: str = None
     update_status: STATUS = 'empty'
@@ -82,11 +93,16 @@ class Property:
         # toir_id here is property's toir id
         return self.toir_id
 
+    @property
+    def parent_id(self):
+        return self.host_id
+
 
 @dataclass
 class PlanRepair:
     toir_id: str
     repair_id: str
+    object_type: str
     type_repair: reference_attribute.ReferenceAttribute
     toir_url: str
     start_date: str
@@ -110,11 +126,16 @@ class PlanRepair:
         result = [one for one in cons if one]
         return ' '.join(result)
 
+    @property
+    def parent_id(self):
+        return self.host_id
+
 
 @dataclass
 class FactRepair:
     toir_id: str
     repair_id: str
+    object_type: str
     type_repair: reference_attribute.ReferenceAttribute
     toir_url: str
     fact_start_date: str
@@ -140,6 +161,10 @@ class FactRepair:
         result = [one for one in cons if one]
         return ' '.join(result)
 
+    @property
+    def parent_id(self):
+        return self.host_id
+
 
 @dataclass
 class Movement:
@@ -147,6 +172,7 @@ class Movement:
     previous_toir_id: str
     previous_name: str
     movement_reason: str
+    object_type: str
     movement_date: datetime
     self_id: str = None
     host_id: str = None
@@ -163,3 +189,7 @@ class Movement:
     @property
     def unique_id(self):
         return self.previous_toir_id
+
+    @property
+    def parent_id(self):
+        return self.host_id

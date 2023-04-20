@@ -12,6 +12,7 @@ class ObjectRepairGroup:
     parent_toir_id: str
     name: str
     toir_url: str
+    object_type: str
     departament: reference_attribute.ReferenceAttribute
     parent_object = None
     self_id: str = None
@@ -21,6 +22,18 @@ class ObjectRepairGroup:
 
     def get_nested_objects(self):
         return []
+
+    @property
+    def nested_objects_map(self):
+        return []
+
+    @property
+    def unique_id(self):
+        return self.toir_id
+
+    @property
+    def parent_id(self):
+        return self.parent_object.self_id if self.parent_object else None
 
     def to_compare_dict(self) -> dict:
         return {
@@ -55,4 +68,5 @@ class ObjectRepairGroup:
             toir_url=data.get('toir_url'),
             self_id=data.get('self_id'),
             replaced=data.get('replaced'),
+            object_type='object_repair_group'
         )

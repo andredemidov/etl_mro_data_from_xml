@@ -15,10 +15,11 @@ class TestGetNewDataAdapter(unittest.TestCase):
             'forvalidation',
             '81066aeb-ca71-11ea-8528-005056a40062',
             'forvalidation',
+            'operation_object',
         )
 
         # act
-        equipments = adapter.get_new_equipment(fake_operation_object)
+        equipments = adapter.retrieve(fake_operation_object, 'equipment')
         print(len(equipments))
         # assert
         self.assertNotEqual(len(equipments), 0)

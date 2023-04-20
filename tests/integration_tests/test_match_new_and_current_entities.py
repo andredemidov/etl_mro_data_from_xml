@@ -19,18 +19,19 @@ class TestMatchNewAndCurrentEntities(unittest.TestCase):
             'e82ff66b-a1b9-ed11-915f-005056b6948b',
             '81066aeb-ca71-11ea-8528-005056a40062',
             'forvalidation',
+            'operation_object',
         )
-        fake_current_repository = repositories.CurrentObjectsRepository(
+        fake_current_repository = repositories.RepairObjectsRepository(
             operation_object=fake_operation_object,
-            get_current_data_adapter=get_current_adapter
+            get_data_adapter=get_current_adapter
         )
 
         file_path = 'C:/Users/demid/Documents/python/work_projects/toir_integration/test_data/'
         get_new_adapter = data_sources.GetNewDataAdapter(file_path)
 
-        fake_new_repository = repositories.NewObjectsRepository(
+        fake_new_repository = repositories.RepairObjectsRepository(
             operation_object=fake_operation_object,
-            get_new_data_adapter=get_new_adapter,
+            get_data_adapter=get_new_adapter,
             post_data_adapter=None,
         )
 

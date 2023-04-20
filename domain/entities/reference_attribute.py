@@ -18,4 +18,4 @@ class ReferenceAttribute:
 
     @property
     def comparison_value(self):
-        return self.value if self.value else self.reference_name
+        return self.toir_id
