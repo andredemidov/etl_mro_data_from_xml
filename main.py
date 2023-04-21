@@ -1,4 +1,5 @@
 import logging
+import sys
 from collections import Counter
 from datetime import datetime
 from domain import transformations, repositories
@@ -6,7 +7,7 @@ import data_sources
 
 URL = 'https://operation.irkutskoil.ru/'
 XML_FILE_DIRECTORY = '//irkoil/dfs/WorkDATA/1C_OBMEN/ТОиР_Неосинтез/'
-
+MODES = ['dim', 'toir']
 
 def log_statistic(statistic: dict):
     message = ', '.join([f'{c[0]} - {c[1]}' for c in statistic.items()])
@@ -31,8 +32,8 @@ def integrate_operation_object(operation_object, get_new_data_adapter, get_curre
     current_repository = repositories.RepairObjectsRepository(operation_object, get_current_data_adapter)
     current_dim_repository = repositories.DimensionsRepository(get_data_adapter=get_current_data_adapter)
 
-    transformations.GetDataFromDimensions(current_repository, current_dim_repository)
-    transformations.GetDataFromDimensions(new_repository, current_dim_repository)
+    transformations.GetDataFromDimensions(current_repository, current_dim_repository).execute()
+    transformations.GetDataFromDimensions(new_repository, current_dim_repository).execute()
 
     transformations.MatchNewAndCurrentEntities(
         new_entities_repository=new_repository,
@@ -40,7 +41,8 @@ def integrate_operation_object(operation_object, get_new_data_adapter, get_curre
     ).execute()
     statuses = list(map(lambda x: x.update_status, new_repository.get()))
     counter = Counter(statuses)
-    logging.info(f'statuses: {counter}')
+    logging.info(f'statuses:')
+    log_statistic(counter)
 
     logging.info('creating and updating')
     statistic = new_repository.save()
@@ -54,7 +56,8 @@ def integrate_operation_object(operation_object, get_new_data_adapter, get_curre
             for item in nested_items:
                 nested_object_statuses.append(item.update_status)
     counter = Counter(statuses)
-    logging.info(f'nested objects statuses: {counter}')
+    logging.info(f'nested objects statuses:')
+    log_statistic(counter)
 
     logging.info('creating and updating nested objects')
     statistic = new_repository.save_nested_objects()
@@ -82,7 +85,8 @@ def update_dimension_tables(get_new_data_adapter, get_current_data_adapter, post
     ).execute()
     statuses = list(map(lambda x: x.update_status, new_repository.get()))
     counter = Counter(statuses)
-    logging.info(f'statuses: {counter}')
+    logging.info(f'statuses:')
+    log_statistic(counter)
     # update and create data in neosintez
     logging.info('creating and updating dimensions')
     statistic = new_repository.save()
@@ -112,27 +116,41 @@ def init_neosintez_session(url, auth_data_file_path: str = None):
 
 if __name__ == '__main__':
     session = None
+
+    if len(sys.argv) != 2:
+        raise EnvironmentError('Mode expected')
+    mode = sys.argv[1]
+    if mode not in MODES:
+        raise EnvironmentError(f'Invalid mode {mode}. Only {",".join(MODES)} are available')
+
     try:
         init_log()
         session = init_neosintez_session(URL)
         get_new_data_adapter = data_sources.GetNewDataAdapter(file_directory=XML_FILE_DIRECTORY)
         get_current_data_adapter = data_sources.GetCurrentDataAdapter(url=URL, session=session)
         post_data_adapter = data_sources.PostDataAdapter(url=URL, session=session)
-        operation_object_repository = repositories.OperationObjectsRepository(get_current_data_adapter)
-        logging.info(f'Total objects {len(operation_object_repository.get())}')
 
-        for operation_object in operation_object_repository.get():
-            try:
-                integrate_operation_object(
-                    operation_object,
-                    get_new_data_adapter,
-                    get_current_data_adapter,
-                    post_data_adapter
-                )
+        if mode == 'toir':
+            operation_object_repository = repositories.OperationObjectsRepository(get_current_data_adapter)
+            logging.info(f'Total objects {len(operation_object_repository.get())}')
+            for operation_object in operation_object_repository.get():
+                try:
+                    integrate_operation_object(
+                        operation_object=operation_object,
+                        get_new_data_adapter=get_new_data_adapter,
+                        get_current_data_adapter=get_current_data_adapter,
+                        post_data_adapter=post_data_adapter
+                    )
 
-            except Exception as e:
-                print(e)
-                logging.exception('Exception occurred')
+                except Exception as e:
+                    print(e)
+                    logging.exception('Exception occurred')
+        elif mode == 'dim':
+            update_dimension_tables(
+                get_new_data_adapter=get_new_data_adapter,
+                get_current_data_adapter=get_current_data_adapter,
+                post_data_adapter=post_data_adapter
+            )
     finally:
         session.close()
         logging.info('Session is closed')
