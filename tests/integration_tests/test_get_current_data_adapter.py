@@ -18,10 +18,11 @@ class TestGetCurrentDataAdapter(unittest.TestCase):
             'e82ff66b-a1b9-ed11-915f-005056b6948b',
             '81066aeb-ca71-11ea-8528-005056a40062',
             'forvalidation',
+            'operation_object',
         )
-        fake_repository = repositories.CurrentObjectsRepository(
+        fake_repository = repositories.RepairObjectsRepository(
             operation_object=fake_operation_object,
-            get_current_data_adapter=adapter
+            get_data_adapter=adapter
         )
 
         # act

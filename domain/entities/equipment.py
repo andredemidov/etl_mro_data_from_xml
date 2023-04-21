@@ -14,6 +14,7 @@ class Equipment:
     parent_toir_id: str
     name: str
     operating: float
+    object_type: str
     departament: reference_attribute.ReferenceAttribute
     typical_object: reference_attribute.ReferenceAttribute
     toir_url: str
@@ -23,7 +24,7 @@ class Equipment:
     commodity_producer: str = None
     commodity_number: str = None
     operation_date: datetime = None
-    category: reference_attribute.ReferenceAttribute = None
+    category: str = None
     replaced: bool = False
     object_id: str = None
 
@@ -40,6 +41,14 @@ class Equipment:
     def __str__(self):
         return f'{self.name}, {self.toir_id}'
 
+    @property
+    def unique_id(self):
+        return self.toir_id
+
+    @property
+    def parent_id(self):
+        return self.parent_object.self_id if self.parent_object else None
+
     def get_nested_objects(self):
         return [
             self.properties,
@@ -48,6 +57,17 @@ class Equipment:
             self.failures,
             self.parts,
         ]
+
+    @property
+    def nested_objects_map(self):
+        nested_objects = [
+            {'nested_object': 'property', 'attribute_name': 'properties'},
+            {'nested_object': 'plan_repair', 'attribute_name': 'plan_repairs'},
+            {'nested_object': 'fact_repair', 'attribute_name': 'fact_repairs'},
+            {'nested_object': 'failure', 'attribute_name': 'failures'},
+            {'nested_object': 'part', 'attribute_name': 'parts'},
+        ]
+        return nested_objects
 
     def to_compare_dict(self) -> dict:
         return {
@@ -61,7 +81,7 @@ class Equipment:
             'object_id': self.object_id,
             'departament': self.departament.comparison_value,
             'typical_object': self.typical_object.comparison_value,
-            # 'category': self.category.comparison_value,
+            'category': self.category,
         }
 
     def to_dict(self) -> dict:
@@ -79,7 +99,7 @@ class Equipment:
             'commodity_producer': self.commodity_producer,
             'commodity_number': self.commodity_number,
             'operation_date': self.operation_date,
-            'category': self.category.value,
+            'category': self.category,
             'self_id': self.self_id,
             'update_status': self.update_status,
             'replaced': self.replaced,
@@ -104,4 +124,5 @@ class Equipment:
             self_id=data.get('self_id'),
             category=data.get('category'),
             replaced=data.get('replaced'),
+            object_type='equipment',
         )

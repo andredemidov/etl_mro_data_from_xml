@@ -35,42 +35,6 @@ class Repository:
         self._entries.extend(entries)
 
 
-class CurrentObjectsRepository(Repository):
-
-    def __init__(self, operation_object: entities.OperationObject, get_current_data_adapter):
-        self._operation_object = operation_object
-        self._get_current_data_adapter = get_current_data_adapter
-        super().__init__()
-
-    def _get_data_from_source(self):
-        # Список типов объектов, которые будут извлекаться с помощью адаптера
-        objects = ['object_repair_group', 'tech_position', 'equipment']
-        # Здесь репозиторий взаимодействует с адаптером для получения соответствующих данных
-        # метод реализует интерфейс, в соответствии с которым адаптер должен иметь метод retrieve, принимающий два
-        # аргумента: объект OperationObject и строку с типом объекта.
-        # Репозиторий содержит одновременно сущности трех классов
-        for object_type in objects:
-            items = self._get_current_data_adapter.retrieve(self._operation_object, object_type)
-            self.add(items)
-
-        # nested objects
-        nested_objects = [
-            {'nested_object': 'property', 'attribute_name': 'properties'},
-            {'nested_object': 'plan_repair', 'attribute_name': 'plan_repairs'},
-            {'nested_object': 'fact_repair', 'attribute_name': 'fact_repairs'},
-            {'nested_object': 'failure', 'attribute_name': 'failures'},
-            {'nested_object': 'part', 'attribute_name': 'parts'},
-        ]
-        # Аналогично и по вложенным объектам. Адаптер должен соответствовать интерфейсу
-        for nested_object in nested_objects:
-            self._get_current_data_adapter.join_nested_objects_to_entities(
-                operation_object=self._operation_object,
-                items=self._entries,
-                retrievable_nested_object=nested_object['nested_object'],
-                attribute_name=nested_object['attribute_name'],
-            )
-
-
 class OperationObjectsRepository(Repository):
 
     def __init__(self, get_current_data_adapter):
@@ -85,22 +49,52 @@ class OperationObjectsRepository(Repository):
         self.add(items)
 
 
-class NewObjectsRepository(Repository):
+class DimensionsRepository(Repository):
 
-    def __init__(self, operation_object: entities.OperationObject, get_new_data_adapter, post_data_adapter):
-        self._operation_object = operation_object
-        self._get_new_data_adapter = get_new_data_adapter
+    def __init__(self, get_data_adapter, post_data_adapter=None):
+        self._get_data_adapter = get_data_adapter
         self._post_data_adapter = post_data_adapter
         super().__init__()
 
     def _get_data_from_source(self):
         # Здесь репозиторий взаимодействует с адаптером для получения соответствующих данных
-        object_repair_groups = self._get_new_data_adapter.get_new_object_repair_group(self._operation_object)
-        self.add(object_repair_groups)
-        equipment = self._get_new_data_adapter.get_new_equipment(self._operation_object)
-        self.add(equipment)
-        tech_position = self._get_new_data_adapter.get_new_tech_position(self._operation_object)
-        self.add(tech_position)
+
+        objects = ['dim_departament', 'dim_type_failure', 'dim_type_repair', 'dim_property', 'dim_typical_object', 'dim_type_reason_failure']
+        for object_type in objects:
+            items = self._get_data_adapter.retrieve(None, object_type)
+            self.add(items)
+
+    def save(self):
+        if not self._post_data_adapter:
+            raise NotImplementedError('There is no post adapter')
+        statistic = {'success': 0, 'error': 0}
+        actions = {
+            'updated': self._post_data_adapter.update,
+            'new': self._post_data_adapter.create,
+        }
+        items = self.get()
+        items.sort(key=lambda x: x.level)
+        for item in items:
+            action = actions.get(item.update_status)
+            if action:
+                status = action(item)
+                statistic[status] += 1
+        return statistic
+
+
+class RepairObjectsRepository(Repository):
+
+    def __init__(self, operation_object: entities.OperationObject, get_data_adapter, post_data_adapter=None):
+        self._operation_object = operation_object
+        self._get_data_adapter = get_data_adapter
+        self._post_data_adapter = post_data_adapter
+        super().__init__()
+
+    def _get_data_from_source(self):
+        objects = ['object_repair_group', 'tech_position', 'equipment']
+        for object_type in objects:
+            items = self._get_data_adapter.retrieve(self._operation_object, object_type)
+            self.add(items)
 
     def save(self) -> dict:
         """
@@ -132,7 +126,7 @@ class NewObjectsRepository(Repository):
         """
         statistic = {'success': 0, 'error': 0}
         actions = {
-            'updated': self._post_data_adapter.update_nested_object,
+            'updated': self._post_data_adapter.update,
             'new': self._post_data_adapter.create_nested_object,
         }
         # get only relevant (not for delete) host items

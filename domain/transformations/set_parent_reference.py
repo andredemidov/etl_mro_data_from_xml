@@ -1,6 +1,6 @@
 class SetParentReference:
 
-    def __init__(self, operation_object, repository):
+    def __init__(self, repository, operation_object=None):
         self._repository = repository
         self._operation_object = operation_object
 
@@ -11,6 +11,7 @@ class SetParentReference:
 
     def execute(self):
         data_dict = dict(map(lambda x: (x.toir_id, x), self._repository.get()))
-        data_dict.update({self._operation_object.toir_id: self._operation_object})
+        if self._operation_object:
+            data_dict.update({self._operation_object.toir_id: self._operation_object})
 
         self._set_parent_for_entity(data_dict, self._repository)

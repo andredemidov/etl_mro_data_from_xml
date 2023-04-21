@@ -18,6 +18,7 @@ class TestMain(unittest.TestCase):
             self_id='1ac47979-dedc-ed11-916a-005056b6948b',
             toir_id='d799f194-fc65-11e5-81a1-005056a4190d',
             object_id='forvalidation',
+            object_type='operation_object',
         )
         file_path = 'C:/Users/demid/Documents/python/work_projects/toir_integration/test_data/'
         get_new_adapter = data_sources.GetNewDataAdapter(file_path)

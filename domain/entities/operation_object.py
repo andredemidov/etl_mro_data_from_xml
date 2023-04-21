@@ -7,3 +7,4 @@ class OperationObject:
     self_id: str
     toir_id: str
     object_id: str
+    object_type: str
