@@ -99,6 +99,10 @@ class NeosintezGateway:
         req_url = self._url + f'api/objects/{host}/collections?attributeId={collection_attribute_id}&Take=100'
         return self._session.get(req_url)
 
+    def change_name(self, item_id, name):
+        req_url = self._url + f'api/objects/{item_id}/name?new={name}'
+        return self._session.put(req_url)
+
     def change_parent(self, item_id, parent_item_id):
         req_url = self._url + f'api/objects/{item_id}/parent?parentId={parent_item_id}'
         return self._session.put(req_url)
