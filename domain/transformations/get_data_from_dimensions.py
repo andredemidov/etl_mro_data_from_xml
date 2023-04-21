@@ -15,12 +15,14 @@ class GetDataFromDimensions:
         for attribute in reference_attributes:
             if attribute.toir_id:
                 dimension = self._indexed_by_toir_id.get(attribute.toir_id)
-                attribute.reference_id = dimension.self_id
-                attribute.reference_name = dimension.name
+                if dimension:
+                    attribute.reference_id = dimension.self_id
+                    attribute.reference_name = dimension.name
             elif attribute.reference_id:
                 dimension = self._indexed_by_reference_id.get(attribute.reference_id)
-                attribute.toir_id = dimension.toir_id
-                attribute.value = dimension.name
+                if dimension:
+                    attribute.toir_id = dimension.toir_id
+                    attribute.value = dimension.name
 
     def execute(self):
         self._indexed_by_toir_id = {dimension.toir_id: dimension for dimension in self._dim_repository.get()}

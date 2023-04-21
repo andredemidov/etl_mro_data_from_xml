@@ -68,7 +68,6 @@ class GetNewDataAdapter:
 
                 self._get_nested_objects(item, element)
 
-                # self._get_reference_attribute_value(item)
         else:
             file = serializer.file
             data = self._get_dimensions_data_from_file(file)
@@ -103,8 +102,6 @@ class GetNewDataAdapter:
                 # do not serialize empty objects
                 xml_elements = list(filter(lambda x: len(x) > 1, xml_elements))
                 item_nested_objects = [serializer.init_from_xml(one) for one in xml_elements]
-                # for nested_object in item_nested_objects:
-                #     self._get_reference_attribute_value(nested_object)
                 if item_nested_objects:
                     setattr(item, attribute_name, item_nested_objects)
 
@@ -125,83 +122,3 @@ class GetNewDataAdapter:
             rows.append(values)
 
         return list(map(lambda x: dict(zip(headers, x)), rows))
-
-    # def get_new_equipment(self, operation_object: entities.OperationObject) -> Sequence[entities.Equipment]:
-    #     xml_elements = xml_file.GetElementsByParent(self._elements).execute(operation_object.toir_id, 'equipment')
-    #     result = list()
-    #     for element in xml_elements:
-    #         item = serializers.EquipmentSerializer.init_from_xml(element)
-    #         item.object_id = operation_object.object_id
-    #         result.append(item)
-    #
-    #         item.properties = self._get_nested_objects(element, 'Характеристики')
-    #         item.fact_repairs = self._get_nested_objects(element, 'ИсторияРемонтов')
-    #         item.plan_repairs = self._get_nested_objects(element, 'ПредстоящиеРемонты')
-    #         item.failures = self._get_nested_objects(element, 'Отказы')
-    #         item.parts = self._get_nested_objects(element, 'Запчасти')
-    #
-    #         self._get_reference_attribute_value(item)
-    #     return result
-    #
-    # def get_new_tech_position(self, operation_object: entities.OperationObject) -> Sequence[entities.TechPosition]:
-    #     xml_elements = xml_file.GetElementsByParent(self._elements).execute(operation_object.toir_id, 'tech_position')
-    #     result = list()
-    #     for element in xml_elements:
-    #         item = serializers.TechPositionSerializer.init_from_xml(element)
-    #         item.object_id = operation_object.object_id
-    #         result.append(item)
-    #
-    #         item.properties = self._get_nested_objects(element, 'Характеристики')
-    #         item.fact_repairs = self._get_nested_objects(element, 'ИсторияРемонтов')
-    #         item.plan_repairs = self._get_nested_objects(element, 'ПредстоящиеРемонты')
-    #         item.failures = self._get_nested_objects(element, 'Отказы')
-    #         item.parts = self._get_nested_objects(element, 'Запчасти')
-    #
-    #         self._get_reference_attribute_value(item)
-    #     return result
-    #
-    # def get_new_object_repair_group(
-    #         self,
-    #         operation_object: entities.OperationObject) -> Sequence[entities.ObjectRepairGroup]:
-    #     xml_elements = xml_file.GetElementsByParent(self._elements).execute(operation_object.toir_id,
-    #                                                                         'object_repair_group')
-    #     result = list()
-    #     for element in xml_elements:
-    #         item = serializers.ObjectRepairGroupSerializer.init_from_xml(element)
-    #         item.object_id = operation_object.object_id
-    #         result.append(item)
-    #
-    #         self._get_reference_attribute_value(item)
-    #
-    #     return result
-
-    # def _get_reference_attribute_value(self, item):
-    #     reference_attributes: list[entities.ReferenceAttribute] = list(
-    #         filter(lambda x: isinstance(x, entities.ReferenceAttribute), item.__dict__.values()))
-    #
-    #     # filter attributes where toir id is equal '00000000-0000-0000-0000-000000000000'
-    #     reference_attributes = list(
-    #         filter(lambda x: x.toir_id != '00000000-0000-0000-0000-000000000000', reference_attributes))
-    #     for attribute in reference_attributes:
-    #         attribute_name = attribute.name
-    #         toir_id = attribute.toir_id
-    #         # check whether value already exists
-    #         ids = self.dimensions.get(attribute_name)
-    #         attribute_data = ids.get(toir_id) if ids else None
-    #         if attribute_data:
-    #             attribute.value = attribute_data['value']
-    #             attribute.parent_toir_id = attribute_data['parent']
-
-    # @property
-    # def dimensions(self):
-    #     if self.REFERENCE_ATTRIBUTES_VALUES:
-    #         return self.REFERENCE_ATTRIBUTES_VALUES
-    #
-    #     for table, config in serializers.Serializer.dimension_files.items():
-    #         data = self._get_dimensions_data_from_file(config['file'])
-    #         # dict like {attribute_name: {toir_id: {value: value, parent: parent}}}
-    #         data_dict = dict(map(lambda x: (x[config['toir_id']],
-    #                                         {'value': x.get(config['value']),
-    #                                          'parent': x.get(config['parent'])}), data))
-    #         self.REFERENCE_ATTRIBUTES_VALUES[table] = data_dict
-    #     return self.REFERENCE_ATTRIBUTES_VALUES
