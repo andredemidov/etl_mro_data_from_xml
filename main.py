@@ -137,6 +137,7 @@ if __name__ == '__main__':
             operation_object_repository = repositories.OperationObjectsRepository(get_current_data_adapter)
             logging.info(f'Total objects {len(operation_object_repository.get())}')
             for operation_object in operation_object_repository.get():
+                logging.info(operation_object.name)
                 try:
                     integrate_operation_object(
                         operation_object=operation_object,
