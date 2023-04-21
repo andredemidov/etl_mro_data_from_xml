@@ -24,7 +24,7 @@ class Serializer:
     registration_number_attribute_id = 'f535c056-0b29-e811-810d-c4afdb1aea70'
     commodity_producer_attribute_id = '626cd129-e330-e811-810f-edf0bf5e0091'
     commodity_number_attribute_id = '706297c6-0a29-e811-810d-c4afdb1aea70'
-    category_attribute_id = '98a4bfa3-0929-e811-810d-c4afdb1aea70'
+    category_attribute_id = '8b64419b-f3df-ed11-916a-005056b6948b'
 
     # collection classes
     failure_collection_class_id = 'e483b423-1131-e811-810f-edf0bf5e0091'
@@ -72,77 +72,6 @@ class Serializer:
     dim_typical_object_class_id = 'b4b245dc-34e1-ea11-9110-005056b6948b'
     dim_type_reason_failure_class_id = '5f50ea6b-5627-e811-810c-9ec54093bb77'
 
-    # reference_attributes = {
-    #     departament_id_attribute_id: {
-    #         'folder_id': 'f558614f-e430-e811-810f-edf0bf5e0091',
-    #         'class_id': dim_departament_class_id,
-    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-    #     },
-    #     type_failure_attribute_id: {
-    #         'folder_id': '512847aa-f730-e811-810f-edf0bf5e0091',
-    #         'class_id': dim_type_failure_class_id,
-    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-    #     },
-    #     type_repair_attribute_id: {
-    #         'folder_id': '0d84ecc4-f730-e811-810f-edf0bf5e0091',
-    #         'class_id': dim_type_repair_class_id,
-    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-    #     },
-    #     property_attribute_id: {
-    #         'folder_id': '69c6f051-2633-e811-810f-edf0bf5e0091',
-    #         'class_id': dim_property_class_id,
-    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-    #     },
-    #     typical_object_attribute_id: {
-    #         'folder_id': '6c0e01c4-d025-e811-810c-9ec54093bb77',
-    #         'class_id': dim_typical_object_class_id,
-    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-    #     },
-    #     type_reason_failure_attribute_id: {
-    #         'folder_id': 'ebb409d7-f730-e811-810f-edf0bf5e0091',
-    #         'class_id': dim_type_reason_failure_class_id,
-    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-    #     }
-    # }
-    # dimension_files = {
-    #     'ВидРемонта': {
-    #         'file': 'ТаблицаВидыРемонтов',
-    #         'toir_id': 'ВидРемонта',
-    #         'value': 'ВидРемонта_Наименование',
-    #         'parent': 'ВидРемонта_Родитель',
-    #     },
-    #     # '':'ТаблицаПараметровНаработки',
-    #     'ВидОтказа': {
-    #         'file': 'ТаблицаВидыОтказа',
-    #         'toir_id': 'ВидОтказа',
-    #         'value': 'ВидОтказа_Наименование',
-    #         'parent_toir_id': 'ВидОтказа_Родитель',
-    #     },
-    #     'ПодразделениеВладелец': {
-    #         'file': 'ТаблицаПодразделений',
-    #         'toir_id': 'МВЗ',
-    #         'value': 'МВЗ_Наименование',
-    #         'parent_toir_id': 'МВЗ_Родитель',
-    #     },
-    #     'ПричинаОтказа': {
-    #         'file': 'ТаблицаПричиныОтказа',
-    #         'toir_id': 'ПричинаОтказа',
-    #         'value': 'ПричинаОтказа_Наименование',
-    #         'parent_toir_id': 'ПричинаОтказа_Родитель',
-    #     },
-    #     'ТиповойОР': {
-    #         'file': 'ТаблицаТОР',
-    #         'toir_id': 'ТиповойОР',
-    #         'value': 'ТиповойОР_Наименование',
-    #         'parent_toir_id': 'ТиповойОР_Родитель',
-    #     },
-    #     'Характеристика': {
-    #         'file': 'ТаблицаХарактеристики',
-    #         'toir_id': 'Характеристика',
-    #         'value': 'Характеристика_Наименование',
-    #         'parent_toir_id': '',
-    #     },
-    # }
     dimensions = {
         'dim_departament': {
             'tag': 'ПодразделениеВладелец',
@@ -154,7 +83,6 @@ class Serializer:
             'class_id': dim_departament_class_id,
             'folder_id': 'f558614f-e430-e811-810f-edf0bf5e0091',
         },
-        # 'dim_category': {'table': '', 'attribute_id': category_attribute_id},
         'dim_type_failure': {
             'tag': 'ВидОтказа',
             'file': 'ТаблицаВидыОтказа',
@@ -234,7 +162,7 @@ class Serializer:
     @staticmethod
     def _get_value_from_xml(element, tag):
         value = element.find(tag).text if element.find(tag) is not None else None
-        if value and value.strip():
+        if value and value.strip() and value.strip() != '00000000-0000-0000-0000-000000000000':
             return value.strip()
         else:
             return None
@@ -750,8 +678,9 @@ class EquipmentSerializer(Serializer):
 
 class FailureSerializer(Serializer):
 
-    class_id = Serializer.fact_repair_collection_class_id
+    class_id = Serializer.failure_collection_class_id
     collection_attribute_id = Serializer.failure_collection_attribute_id
+    tag = 'Отказы'
     object_type = ''
 
     def init_from_xml(self, element) -> entities.Failure:
@@ -862,6 +791,7 @@ class PartSerializer(Serializer):
 
     class_id = Serializer.part_collection_class_id
     collection_attribute_id = Serializer.part_collection_attribute_id
+    tag = 'Запчасти'
     object_type = ''
 
     def init_from_xml(self, element) -> entities.Part:
@@ -976,6 +906,7 @@ class PropertySerializer(Serializer):
 
     class_id = Serializer.property_collection_class_id
     collection_attribute_id = Serializer.property_collection_attribute_id
+    tag = 'Характеристики'
     object_type = ''
 
     def init_from_xml(self, element) -> entities.Property:
@@ -1057,6 +988,7 @@ class FactRepairSerializer(Serializer):
 
     class_id = Serializer.fact_repair_collection_class_id
     collection_attribute_id = Serializer.fact_repair_collection_attribute_id
+    tag = 'ИсторияРемонтов'
     object_type = ''
 
     def init_from_xml(self, element) -> entities.FactRepair:
@@ -1170,6 +1102,7 @@ class PlanRepairSerializer(Serializer):
 
     class_id = Serializer.plan_repair_collection_class_id
     collection_attribute_id = Serializer.plan_repair_collection_attribute_id
+    tag = 'ПредстоящиеРемонты'
     object_type = ''
 
     def init_from_xml(self, element) -> entities.PlanRepair:
@@ -1292,32 +1225,34 @@ def get_serializer(type_object: str):
     :return: объект сериалайзера с соответствующим классом и атрибутами
     """
     retrievable_objects = {
-        'operation_object': OperationObjectSerializer(),
-        'equipment': EquipmentSerializer(),
-        'tech_position': TechPositionSerializer(),
-        'object_repair_group': ObjectRepairGroupSerializer(),
-        'property': PropertySerializer(),
-        'plan_repair': PlanRepairSerializer(),
-        'fact_repair': FactRepairSerializer(),
-        'failure': FailureSerializer(),
-        'part': PartSerializer(),
-        'dim_departament': DimensionSerializer(),
-        # 'category': DimensionSerializer(,
-        'dim_type_failure': DimensionSerializer(),
-        'dim_type_repair': DimensionSerializer(),
-        'dim_property': DimensionSerializer(),
-        'dim_typical_object': DimensionSerializer(),
-        'dim_type_reason_failure': DimensionSerializer(),
+        'operation_object': OperationObjectSerializer,
+        'equipment': EquipmentSerializer,
+        'tech_position': TechPositionSerializer,
+        'object_repair_group': ObjectRepairGroupSerializer,
+        'property': PropertySerializer,
+        'plan_repair': PlanRepairSerializer,
+        'fact_repair': FactRepairSerializer,
+        'failure': FailureSerializer,
+        'part': PartSerializer,
+        'dim_departament': DimensionSerializer,
+        'dim_type_failure': DimensionSerializer,
+        'dim_type_repair': DimensionSerializer,
+        'dim_property': DimensionSerializer,
+        'dim_typical_object': DimensionSerializer,
+        'dim_type_reason_failure': DimensionSerializer,
     }
     if type_object not in retrievable_objects:
         raise TypeError(f'{type_object} is not available')
     serializer = retrievable_objects.get(type_object)
-    serializer.folder_id = serializer.dimensions.get(type_object)['folder_id']
+    serializer = serializer()
+    serializer.folder_id = None
     serializer.object_type = type_object
     if isinstance(serializer, DimensionSerializer):
+        serializer.folder_id = serializer.dimensions.get(type_object)['folder_id']
         serializer.class_id = serializer.dimensions.get(type_object)['class_id']
         serializer.file = serializer.dimensions.get(type_object)['file']
         serializer.toir_id_header = serializer.dimensions.get(type_object)['toir_id_header']
         serializer.parent_toir_id_header = serializer.dimensions.get(type_object)['parent_toir_id_header']
         serializer.name_header = serializer.dimensions.get(type_object)['name_header']
+        serializer.tag = serializer.dimensions.get(type_object)['tag']
     return serializer
