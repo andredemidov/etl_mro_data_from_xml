@@ -39,7 +39,7 @@ class DimensionsRepository(Repository):
         super().__init__()
 
     def _get_data_from_source(self):
-        objects = ['dim_departament', 'dim_category', 'dim_type_failure', 'dim_type_repair', 'dim_property', 'dim_typical_object', 'dim_type_reason_failure']
+        objects = ['dim_departament', 'dim_type_failure', 'dim_type_repair', 'dim_property', 'dim_typical_object', 'dim_type_reason_failure']
         for object_type in objects:
             items = self._get_data_adapter.retrieve(None, object_type)
             self.add(items)

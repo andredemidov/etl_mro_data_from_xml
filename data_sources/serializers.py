@@ -72,87 +72,77 @@ class Serializer:
     dim_typical_object_class_id = 'b4b245dc-34e1-ea11-9110-005056b6948b'
     dim_type_reason_failure_class_id = '5f50ea6b-5627-e811-810c-9ec54093bb77'
 
-    reference_attributes = {
-        departament_id_attribute_id: {
-            'folder_id': 'f558614f-e430-e811-810f-edf0bf5e0091',
-            'class_id': dim_departament_class_id,
-            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-        },
-        category_attribute_id: {
-            'folder_id': 'e0f6bda7-0829-e811-810d-c4afdb1aea70',
-            'class_id': dim_category_class_id,
-            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-        },
-        type_failure_attribute_id: {
-            'folder_id': '512847aa-f730-e811-810f-edf0bf5e0091',
-            'class_id': dim_type_failure_class_id,
-            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-        },
-        unit_attribute_id: {
-            'folder_id': '',
-            'class_id': '',
-            'key_attribute_id': ''
-        },
-        type_repair_attribute_id: {
-            'folder_id': '0d84ecc4-f730-e811-810f-edf0bf5e0091',
-            'class_id': dim_type_repair_class_id,
-            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-        },
-        property_attribute_id: {
-            'folder_id': '69c6f051-2633-e811-810f-edf0bf5e0091',
-            'class_id': dim_property_class_id,
-            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-        },
-        typical_object_attribute_id: {
-            'folder_id': '6c0e01c4-d025-e811-810c-9ec54093bb77',
-            'class_id': dim_typical_object_class_id,
-            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-        },
-        type_reason_failure_attribute_id: {
-            'folder_id': 'ebb409d7-f730-e811-810f-edf0bf5e0091',
-            'class_id': dim_type_reason_failure_class_id,
-            'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
-        }
-    }
-    dimension_files = {
-        'ВидРемонта': {
-            'file': 'ТаблицаВидыРемонтов',
-            'toir_id': 'ВидРемонта',
-            'value': 'ВидРемонта_Наименование',
-            'parent': 'ВидРемонта_Родитель',
-        },
-        # '':'ТаблицаПараметровНаработки',
-        'ВидОтказа': {
-            'file': 'ТаблицаВидыОтказа',
-            'toir_id': 'ВидОтказа',
-            'value': 'ВидОтказа_Наименование',
-            'parent_toir_id': 'ВидОтказа_Родитель',
-        },
-        'ПодразделениеВладелец': {
-            'file': 'ТаблицаПодразделений',
-            'toir_id': 'МВЗ',
-            'value': 'МВЗ_Наименование',
-            'parent_toir_id': 'МВЗ_Родитель',
-        },
-        'ПричинаОтказа': {
-            'file': 'ТаблицаПричиныОтказа',
-            'toir_id': 'ПричинаОтказа',
-            'value': 'ПричинаОтказа_Наименование',
-            'parent_toir_id': 'ПричинаОтказа_Родитель',
-        },
-        'ТиповойОР': {
-            'file': 'ТаблицаТОР',
-            'toir_id': 'ТиповойОР',
-            'value': 'ТиповойОР_Наименование',
-            'parent_toir_id': 'ТиповойОР_Родитель',
-        },
-        'Характеристика': {
-            'file': 'ТаблицаХарактеристики',
-            'toir_id': 'Характеристика',
-            'value': 'Характеристика_Наименование',
-            'parent_toir_id': '',
-        },
-    }
+    # reference_attributes = {
+    #     departament_id_attribute_id: {
+    #         'folder_id': 'f558614f-e430-e811-810f-edf0bf5e0091',
+    #         'class_id': dim_departament_class_id,
+    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+    #     },
+    #     type_failure_attribute_id: {
+    #         'folder_id': '512847aa-f730-e811-810f-edf0bf5e0091',
+    #         'class_id': dim_type_failure_class_id,
+    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+    #     },
+    #     type_repair_attribute_id: {
+    #         'folder_id': '0d84ecc4-f730-e811-810f-edf0bf5e0091',
+    #         'class_id': dim_type_repair_class_id,
+    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+    #     },
+    #     property_attribute_id: {
+    #         'folder_id': '69c6f051-2633-e811-810f-edf0bf5e0091',
+    #         'class_id': dim_property_class_id,
+    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+    #     },
+    #     typical_object_attribute_id: {
+    #         'folder_id': '6c0e01c4-d025-e811-810c-9ec54093bb77',
+    #         'class_id': dim_typical_object_class_id,
+    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+    #     },
+    #     type_reason_failure_attribute_id: {
+    #         'folder_id': 'ebb409d7-f730-e811-810f-edf0bf5e0091',
+    #         'class_id': dim_type_reason_failure_class_id,
+    #         'key_attribute_id': '73e3c201-5527-e811-810c-9ec54093bb77'
+    #     }
+    # }
+    # dimension_files = {
+    #     'ВидРемонта': {
+    #         'file': 'ТаблицаВидыРемонтов',
+    #         'toir_id': 'ВидРемонта',
+    #         'value': 'ВидРемонта_Наименование',
+    #         'parent': 'ВидРемонта_Родитель',
+    #     },
+    #     # '':'ТаблицаПараметровНаработки',
+    #     'ВидОтказа': {
+    #         'file': 'ТаблицаВидыОтказа',
+    #         'toir_id': 'ВидОтказа',
+    #         'value': 'ВидОтказа_Наименование',
+    #         'parent_toir_id': 'ВидОтказа_Родитель',
+    #     },
+    #     'ПодразделениеВладелец': {
+    #         'file': 'ТаблицаПодразделений',
+    #         'toir_id': 'МВЗ',
+    #         'value': 'МВЗ_Наименование',
+    #         'parent_toir_id': 'МВЗ_Родитель',
+    #     },
+    #     'ПричинаОтказа': {
+    #         'file': 'ТаблицаПричиныОтказа',
+    #         'toir_id': 'ПричинаОтказа',
+    #         'value': 'ПричинаОтказа_Наименование',
+    #         'parent_toir_id': 'ПричинаОтказа_Родитель',
+    #     },
+    #     'ТиповойОР': {
+    #         'file': 'ТаблицаТОР',
+    #         'toir_id': 'ТиповойОР',
+    #         'value': 'ТиповойОР_Наименование',
+    #         'parent_toir_id': 'ТиповойОР_Родитель',
+    #     },
+    #     'Характеристика': {
+    #         'file': 'ТаблицаХарактеристики',
+    #         'toir_id': 'Характеристика',
+    #         'value': 'Характеристика_Наименование',
+    #         'parent_toir_id': '',
+    #     },
+    # }
     dimensions = {
         'dim_departament': {
             'tag': 'ПодразделениеВладелец',
@@ -606,8 +596,7 @@ class EquipmentSerializer(Serializer):
                                                     attribute_id=self.departament_id_attribute_id),
             typical_object=entities.ReferenceAttribute(toir_id=typical_object, name='ТиповойОР',
                                                        attribute_id=self.typical_object_attribute_id),
-            category=entities.ReferenceAttribute(value=category, name='КатегорияОборудования',
-                                                 attribute_id=self.category_attribute_id),
+            category=category,
         )
         return repair_object
 
@@ -630,8 +619,7 @@ class EquipmentSerializer(Serializer):
         object_type_id = self._get_value(attributes, self.typical_object_attribute_id, get_only_id=True)
         object_type_name = self._get_value(attributes, self.typical_object_attribute_id)
         operating = self._get_value(attributes, self.operating_attribute_id)
-        category_id = self._get_value(attributes, self.category_attribute_id, get_only_id=True)
-        category_name = self._get_value(attributes, self.category_attribute_id)
+        category = self._get_value(attributes, self.category_attribute_id)
         object_id = self._get_value(attributes, self.object_attribute_id, get_only_id=True)
 
         repair_object = entities.Equipment(
@@ -652,8 +640,7 @@ class EquipmentSerializer(Serializer):
             typical_object=entities.ReferenceAttribute(reference_name=object_type_name, reference_id=object_type_id,
                                                        attribute_id=self.typical_object_attribute_id),
             self_id=self_id,
-            category=entities.ReferenceAttribute(reference_name=category_name, reference_id=category_id,
-                                                 attribute_id=self.category_attribute_id),
+            category=category,
             object_id=object_id,
         )
         return repair_object
@@ -753,8 +740,8 @@ class EquipmentSerializer(Serializer):
             },
             {
                 'Name': 'forvalidation',
-                'Value': item.category.request_value,
-                'Type': 8,
+                'Value': item.category,
+                'Type': 2,
                 'Id': cls.category_attribute_id
             },
         ]

@@ -24,7 +24,7 @@ class Equipment:
     commodity_producer: str = None
     commodity_number: str = None
     operation_date: datetime = None
-    category: reference_attribute.ReferenceAttribute = None
+    category: str = None
     replaced: bool = False
     object_id: str = None
 
