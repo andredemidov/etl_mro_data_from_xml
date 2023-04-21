@@ -53,6 +53,7 @@ class DimensionsRepository(Repository):
             'new': self._post_data_adapter.create,
         }
         items = self.get()
+        items.sort(key=lambda x: x.level)
         for item in items:
             action = actions.get(item.update_status)
             if action:

@@ -26,3 +26,7 @@ class Dimension:
     @property
     def parent_id(self):
         return self.parent_object.self_id if self.parent_object else None
+
+    @property
+    def level(self):
+        return 0 if not self.parent_object else self.parent_object.level + 1
