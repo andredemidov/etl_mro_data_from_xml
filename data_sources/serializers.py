@@ -24,7 +24,7 @@ class Serializer:
     registration_number_attribute_id = 'f535c056-0b29-e811-810d-c4afdb1aea70'
     commodity_producer_attribute_id = '626cd129-e330-e811-810f-edf0bf5e0091'
     commodity_number_attribute_id = '706297c6-0a29-e811-810d-c4afdb1aea70'
-    category_attribute_id = '2daf9add-0a29-e811-810d-c4afdb1aea70'
+    category_attribute_id = '98a4bfa3-0929-e811-810d-c4afdb1aea70'
 
     # collection classes
     failure_collection_class_id = 'e483b423-1131-e811-810f-edf0bf5e0091'
