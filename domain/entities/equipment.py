@@ -81,7 +81,7 @@ class Equipment:
             'object_id': self.object_id,
             'departament': self.departament.comparison_value,
             'typical_object': self.typical_object.comparison_value,
-            # 'category': self.category.comparison_value,
+            'category': self.category,
         }
 
     def to_dict(self) -> dict:
@@ -99,7 +99,7 @@ class Equipment:
             'commodity_producer': self.commodity_producer,
             'commodity_number': self.commodity_number,
             'operation_date': self.operation_date,
-            'category': self.category.value,
+            'category': self.category,
             'self_id': self.self_id,
             'update_status': self.update_status,
             'replaced': self.replaced,
